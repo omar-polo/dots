@@ -5,39 +5,14 @@
 
 Behold, this is my emacs configuration.  Here be dragons.
 
-#+begin_src emacs-lisp
-  ;; -*- lexical-binding: t; -*-
-
-  (require 'cl-lib)
-
-  (message "here be dragons")
-#+end_src
-
-A bit of /clojure-ness/ is always accepted!  I copied the idea of a
-=comment= macro from there.  In elisp there is a =ignore= function,
-but that evaluates its argument, yielding always nil, whereas
-=comment= doesn't evaluate its body.  It's useful to temporary disable
-bits of code.
-
-#+begin_src emacs-lisp
-  (defmacro comment (&rest _body)
-    "Ignore BODY, just like `ignore', but this is a macro."
-    '())
-#+end_src
-
-One drawbacks of using a /literate/ init file is that customisation
-get lost every time it get tangled, because they're usually appended
-at the end of the =user-init-file=.  The simplest solution I found is
-to move the custom stuff in another file, so it gets persisted:
-
-#+begin_src emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (load custom-file)
-#+end_src
-
 * early-init.el
-  It's strange to start with the top of the =init.el= and then talk
-  about the =early-init.el=, isn't it?  Well, that's how thing goes.
+  Starting from emacs 27 (I guess) there is an additional
+  configuration file called =early-init.el=.  As the name suggest,
+  this is called *before* the usual =init.el= or =.emacs=.
+
+  Even if when it's called there is no frame available yet, I found
+  that there's a small boost in the startup by disabling all this
+  cruft before it gets even rendered:
 
   #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
     (when (fboundp 'menu-bar-mode)
@@ -48,27 +23,48 @@ to move the custom stuff in another file, so it gets persisted:
       (scroll-bar-mode -1))
     (when (fboundp 'horizontal-scroll-bar-mode)
       (horizontal-scroll-bar-mode -1))
+  #+end_src
 
+  I also use it to add two very important paths to the the
+  =load-path=: the =lisp= directory, which holds various /smallish/
+  packages and the [[*email][mu4e]] source code.
+
+  #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
     (add-to-list 'load-path
                  (expand-file-name "lisp" user-emacs-directory))
-
     (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+  #+end_src
 
+  Another thing do here is load my custom modeline and theme, now that
+  the =load-path= is correctly populated.
+
+  #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
     (require 'my-modeline)
     (load-theme 'minimal-light t)
+  #+end_src
 
+  Even if I'll be called out for /cargo culting/, I've seen this
+  suggestion in various configuration and, so far, it hasn't caused
+  any drawbacks:
+
+  #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
     ;; Resizing the Emacs frame can be a terribly expensive part of
     ;; changing the font. By inhibiting this, we easily halve startup
     ;; times with fonts that are larger than the system default.
     (setq frame-inhibit-implied-resize t)
+  #+end_src
 
-    ;; save the current gc vars, bump them to infinite and restore on
-    ;; emacs-startup-hook
+  The last trick is to bump the GC threshold during the
+  initialisation.  *Beware*: while this is usually fine, Emacs *will*
+  die from OOM error if bootstrapping straight.el and fetching all the
+  packages!  So remember to disable this when moving this
+  configuration to another place!.
 
-    (defvar my/default-gc-cons-threshold gc-cons-threshold
+  #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+    (defvar op/default-gc-cons-threshold gc-cons-threshold
       "Backup of the default GC threshold.")
 
-    (defvar my/default-gc-cons-percentage gc-cons-percentage
+    (defvar op/default-gc-cons-percentage gc-cons-percentage
       "Backup of the default GC cons percentage.")
 
     ;; boost the gc during the load
@@ -78,8 +74,40 @@ to move the custom stuff in another file, so it gets persisted:
     ;; and reset it to "normal" when done
     (add-hook 'emacs-startup-hook
               (lambda ()
-                (setq gc-cons-threshold my/default-gc-cons-threshold
-                      gc-cons-percentage my/default-gc-cons-percentage)))
+                (setq gc-cons-threshold op/default-gc-cons-threshold
+                      gc-cons-percentage op/default-gc-cons-percentage)))
+  #+end_src
+
+* Preamble
+
+  #+begin_src emacs-lisp
+    ;; -*- lexical-binding: t; -*-
+
+    (require 'cl-lib)
+
+    (message "here be dragons")
+  #+end_src
+
+  A bit of /clojure-ness/ is always accepted!  I copied the idea of a
+  =comment= macro from there.  In elisp there is a =ignore= function,
+  but that evaluates its argument, yielding always nil, whereas
+  =comment= doesn't evaluate its body.  It's useful to temporary disable
+  bits of code.
+
+  #+begin_src emacs-lisp
+    (defmacro comment (&rest _body)
+      "Ignore BODY, just like `ignore', but this is a macro."
+      '())
+  #+end_src
+
+  One drawbacks of using a /literate/ init file is that customisation
+  get lost every time it get tangled, because they're usually appended
+  at the end of the =user-init-file=.  The simplest solution I found is
+  to move the custom stuff in another file, so it gets persisted:
+
+  #+begin_src emacs-lisp
+    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+    (load custom-file)
   #+end_src
 
 * straight
@@ -157,20 +185,6 @@ to move the custom stuff in another file, so it gets persisted:
       :config
       (require 'org-protocol)
 
-      (setq org-publish-project-alist '(("dots-org"
-                                         :base-directory "~/dots"
-                                         :base-extension "org"
-                                         :publishing-directory "~/w/blog/resources/dots/"
-                                         :recursive t
-                                         :publishing-function org-html-publish-to-html)
-                                        ("dots-static"
-                                         :base-directory "~/dots"
-                                         :base-extension "css\\|png\\|jpg\\|jpeg"
-                                         :publishing-directory "~/w/blog/resources/dots/"
-                                         :recursive t
-                                         :publishing-function org-publish-attachment)
-                                        ("dots" :components ("dots-org" "dots-static"))))
-
       (defun op/org-setup ()
         (hl-line-mode +1)
         (auto-fill-mode +1)
@@ -235,6 +249,43 @@ to move the custom stuff in another file, so it gets persisted:
 
 **** TODO wasn't valign included into ELPA?
 
+
+**** Org publish
+     Org publish is a library that allows to generate sets of
+     documents from a directory tree.  It provides some basic
+     mechanisms to copy files around, converting org files to other
+     formats (HTML for instance).  I know some people use it to
+     generate static websites, I'm using it to publish my =dots= repo
+     on the web (and soon on Gemini!)
+
+     The variable =org-publish-project-alist= as an alist of
+     =("name" props...)=.
+
+     To publish org files as another file and copy files as-is, the
+     best way I found is to define multiple targets, one for org and
+     one for the copy, and require with the =:components= props from
+     another target.
+
+     #+begin_src emacs-lisp
+       (with-eval-after-load 'org
+         (setq org-publish-project-alist
+               '(("dots-org"
+                  :base-directory "~/dots"
+                  :base-extension "org"
+                  :publishing-directory "~/w/blog/resources/dots/"
+                  :recursive t
+                  :publishing-function org-html-publish-to-html)
+                 ("dots-static"
+                  :base-directory "~/dots"
+                  :base-extension "css\\|png\\|jpg\\|jpeg"
+                  :publishing-directory "~/w/blog/resources/dots/"
+                  :recursive t
+                  :publishing-function org-publish-attachment)
+                 ("dots" :components ("dots-org" "dots-static"))))
+
+         (define-key global-map (kbd "C-z p p") #'org-publish)
+         (define-key global-map (kbd "C-z p P") #'org-publish-all))
+     #+end_src
 * Misc
   The following are some misc customizations.  They can't be split in
   their own blocks, either because are variables defined in C or are
