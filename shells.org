@@ -1,0 +1,852 @@
+#+TITLE: Shells
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
+
+* Profile
+  :PROPERTIES:
+  :header-args: :tangle ~/.profile
+  :END:
+
+  I don't know how "portable" a =.profile= can be, but let's try!
+
+  Although I'm not using acme as my go-to text editor anymore, I still
+  like to use it from time to time, and have the rest of the plan9
+  ports at hand.
+
+  I manually fetched and installed the ports in =/usr/local/plan9=,
+  and need to define =$PLAN9= in order for the various tooling to work.
+  #+begin_src sh
+    PLAN9=/usr/local/plan9
+    export PLAN9
+  #+end_src
+
+  I also tend to have an abnormal =$PATH=:
+  #+begin_src sh
+    PATH=$HOME/bin:$HOME/opt/emacs/bin:$HOME/opt/gcc10/bin:$HOME/go/bin:$HOME/opt/unnethack/bin:$HOME/.local/bin:$HOME/.node_modules/bin:/usr/ports/infrastructure/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/usr/local/sbin:/usr/games:/usr/local/jdk-11/bin:$PLAN9/bin
+    export PATH HOME TERM
+  #+end_src
+
+  Let's split it:
+  - =$HOME/bin= is for my personal scripts, it needs to take
+    precedence over anything else
+  - =$HOME/opt/*= contains various stuff I compile from source, like emacs
+  - =$HOME/.local/bin= is XDG stuff I'm practically forced to use
+  - =$HOME/.node_modules/bin= is for node
+  - =/usr/ports/infrastructure/bin= holds some handy port tools
+  - the rest is the usual =$PATH= on OpenBSD, with the addition of
+    java and plan9 at the end.
+
+  Tell npm to install things globally in the right directory:
+
+  #+begin_src sh
+    export npm_config_prefix=~/.node_modules
+  #+end_src
+
+  ksh doesn't have a "deafult" configuration file (like =~/.zshrc=
+  for zsh or =~/.bashrc= for bash); instead, if called interactively
+  it loads the file pointed by =$ENV=.  Tell ksh to load =~/.kshrc=
+  then:
+
+  #+begin_src sh
+    export ENV=$HOME/.kshrc
+  #+end_src
+
+  An UTF-8 locale is almost mandatory, and since we're there use
+  =en_US= as the language, even if it's not my main tongue
+
+  #+begin_src sh
+    export LANG=en_US.UTF-8
+  #+end_src
+
+  Got is quickly becoming my favourite version control system.  It
+  should be able to load the author data from a config file, but I
+  still keep this variable, just in case
+
+  #+begin_src sh
+    export GOT_AUTHOR="Omar Polo <op@omarpolo.com>"
+  #+end_src
+
+  Sometimes I need to do stuff with Docker.  I have a virtual machine
+  running alpine with docker configured, and this bit here will allow
+  docker-cli to transparently talk to the VM:
+
+  #+begin_src sh
+    export DOCKER_HOST=tcp://100.64.1.3:2375
+  #+end_src
+
+  I like to use =mg= as my default editor, but under =vterm= is a bit
+  of a pain in the ass to use, since the various =C-c= and =C-x=
+  command are intercepted by Emacs.  Thus, use =vi= as the editor when
+  =INSIDE_EMACS= (which sound strange, but for programs like =got=
+  that spawns an editor it's the best choice I found)
+
+  #+begin_src sh
+    if [ -z "$INSIDE_EMACS" ]; then
+	    VISUAL=mg
+	    EDITOR=mg
+    else
+	    VISUAL=vi
+	    EDITOR=ed
+    fi
+    export VISUAL EDITOR
+  #+end_src
+
+  less should be the default pager pretty most everywhere, but ensure
+  that!
+
+  #+begin_src sh
+    export MANPAGER=less
+  #+end_src
+
+  I'm using reposync to manage my local clone of the OpenBSD source
+  tree.  Technically this isn't needed, because now =/usr/ports= is a
+  checkout from =/home/cvs/...=, but anyway
+
+  #+begin_src sh
+    export CVSROOT=/home/cvs
+  #+end_src
+
+  This is just to make some command outputs a bit nicer:
+
+  #+begin_src sh
+    export BLOCKSIZE=1m
+  #+end_src
+
+  I don't particularly like colored outputs when I'm in front of a
+  terminal, so I tend to disable them:
+
+  #+begin_src sh
+    export NO_COLOR='yes, please'
+    export CMAKE_COLOR_MAKEFILE='OFF'
+    export WG_COLOR_MODE=never
+    export TREE_COLORS=no
+  #+end_src
+
+  Then disable the colors in the boot (a clojure build tool I'm not
+  using anymore) and fix its =gpg= command:
+#+begin_src sh
+  export BOOT_COLOR=no
+  export BOOT_GPG_COMMAND=gpg2
+#+end_src
+
+  At some point I had a problem with leiningen that required this
+  workaround.  I've mostly switched to =deps.edn= now, but it's useful
+  to keep this around:
+
+  #+begin_src sh
+    export SHASUM_CMD='cksum -a sha256'
+  #+end_src
+
+  At least on OpenBSD, automake and autoconf requires these variables
+  to be set to work
+
+  #+begin_src sh
+    export AUTOCONF_VERSION=2.69
+    export AUTOMAKE_VERSION=1.16
+  #+end_src
+
+    Some time ago I played with [[https://cons.io/][gerbil]], a scheme dialect, and I should
+    still have it installed.
+
+    #+begin_src sh
+      GERBIL_HOME=/usr/local/gerbil
+      PATH=$PATH:$GERBIL_HOME/bin
+      export GERBIL_HOME PATH
+    #+end_src
+
+    I also played a bit with chicken.  Don't remember why I set all
+    these variables, but for the time being, keep 'em
+
+    #+begin_src sh
+      #export CHICKEN_INSTALL_REPOSITORY=$HOME/.local/lib/chicken
+      chicken=$HOME/.chicken/11/
+      CHICKEN_REPOSITORY_PATH=$chicken:/usr/local/lib/chicken/11
+      CHICKEN_INSTALL_REPOSITORY=$chicken
+      CHICKEN_INCLUDE_PATH=$chicken
+      CHICKEN_DOC_REPOSITORY=$chicken/chicken-doc
+
+      export CHICKEN_REPOSITORY_PATH CHICKEN_INSTALL_REPOSITORY
+      export CHICKEN_INCLUDE_PATH CHICKEN_DOC_REPOSITORY
+    #+end_src
+
+    I don't use ripgrep, grep is fine for me, but I remember I was
+    particularly annoyed by the format of its output.  Just in case I
+    need to use it again, here's what I did: first define an env
+    variable that points to a configuration file:
+
+    #+begin_src sh
+      export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+    #+end_src
+
+    then put the following in =~/.ripgreprc=:
+
+    #+begin_src conf :tangle ~/.ripgreprc
+      # disable colors
+      --color=never
+      # decent output format, like grep -Hn
+      --vimgrep
+      # use smart case
+      --smart-case
+    #+end_src
+
+    Finally, load the specific profile for this machine, if it exists:
+
+    #+begin_src sh
+      if [ -f "$HOME/.profile-local" ]; then
+	      . $HOME/.profile-local
+      fi
+    #+end_src
+
+* OpenBSD ksh
+  :PROPERTIES:
+  :header-args: :tangle ~/.kshrc
+  :END:
+
+  OpenBSD ksh (sometimes called opdksh or oksh) is the default shell
+  on OpenBSD, and is generally my go-to choice on other systems too.
+  It has a good ratio of feature and simplicity.
+
+  #+begin_src sh
+    if [ "$TERM" = dumb ]; then
+	    PS1='$ '
+	    return
+    fi
+  #+end_src
+
+  Enable emacs-like command editing and csh-like history expansion
+  with =!=
+
+  #+begin_src sh
+    set -o emacs
+    set -o csh-history
+  #+end_src
+
+  Talking about history, by default ksh won't store any.  I don't know
+  how I could live without it, so please enable it!
+
+  #+begin_src sh
+    HISTCONTROL=ignoredups:ignorespace
+    HISTFILE=$HOME/.history
+    HISTSIZE=10000
+  #+end_src
+
+  =CDPATH= is super-useful!  I wrote [[https://www.omarpolo.com/post/enjoying-cdpath.html][a post about it]], also.
+
+  #+begin_src sh
+    export CDPATH=.:$HOME/w:/usr/ports:/usr/ports/mystuff:$HOME/quicklisp/local-projects
+  #+end_src
+
+  I love to hate gpg!  It needs some special treatments to work, and
+  this should also fix pinentry over ssh.  I'm not sure it works
+  though, it's been a while since I connected remotely to my desktop:
+
+  #+begin_src sh
+    export GPG_TTY=$(tty)
+    if [ -n "$SSH_CONNECTION" ]; then
+	    export PINENTRY_USER_DATA="USE_CURSES=1"
+    fi
+  #+end_src
+
+  The BSDs have this incredibly useful signal available, =SIGINFO=,
+  that it's a shame not to use it!
+
+  #+begin_src sh
+    stty status ^T
+  #+end_src
+
+  I really like my prompt to be as minimal as possible.  For some time
+  I used a single colon =;= as prompt, it's really nice!  At the
+  moment though, I'm using a plan9-esque =%=:
+
+  #+begin_src sh
+    PS1='% '
+  #+end_src
+
+** vterm integration
+
+   =vterm= can recognize special escape sequence to pass information
+   (like the current directory) back to Emacs.
+
+   This is an utility function to print things for vterm:
+
+   #+begin_src sh
+     vterm_printf()
+     {
+	     if [ -n "$TMUX" ]; then
+		     printf '\ePtmux;\e\e]%s\007\e\\' "$1"
+	     elif [ "${TERM%%-*}" = "screen" ]; then
+		     printf '\eP\e]%s\007\e\\' "$1"
+	     else
+		     printf '\e]%s\e\\' "$1"
+	     fi
+     }
+   #+end_src
+
+   I like to improve the default vterm experience.  The following will
+   set the hostname and path every time the =$PS1= is printed, so the
+   vterm buffer name can stay in sync, and also overrides the =cd=
+   command:
+
+   #+NAME: when-vterm
+   #+begin_src sh :tangle no
+     clear()
+     {
+	     vterm_printf '51;Evterm-clear-scrollback'
+	     tput clear
+     }
+
+     vterm_set_title()
+     {
+	     printf '\033]0;%s\007' "$(hostname):$PWD"
+     }
+
+     vterm_prompt_end()
+     {
+	     vterm_printf "51;A$USER@$(hostname):$PWD";
+     }
+
+     function cd
+     {
+	     builtin cd "$@"
+	     vterm_set_title
+     }
+
+     vterm_set_title
+     PS1=${PS1%% }'$(vterm_prompt_end) '
+   #+end_src
+
+   but do this only when =$INSIDE_EMACS= is equal to =vterm=!
+
+   #+begin_src sh :noweb strip-export
+     if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+	     <<when-vterm>>
+     fi
+   #+end_src
+
+** completions
+
+   OpenBSD ksh has a limited support for programmed completions!  The
+   idea is that completions are provided via a =complete_$programname=
+   array.  It's possible to provide specific completion for the nth
+   argument via the array =complete_$progname_$nth=.
+
+   I mean, it's not =zsh= or =fish=, but it's more than enough!
+
+   Here's a completion for ssh and scp:
+
+   #+begin_src sh
+     HOST_LIST=$(awk '/Host /{print $2}' ~/.ssh/config | xargs echo)
+
+     set -A complete_ssh -- $HOST_LIST
+     set -A complete_scp -- $HOST_LIST
+   #+end_src
+
+   and another simple one for kill and pkill
+
+   #+begin_src sh
+     set -A complete_kill_1 -- -9 -HUP -INFO -KILL -TERM
+     set -A complete_pkill_2 -- -SIGHUP -SIGUSR1 -SIGUSR2 -SIGTERM -SIGKILL
+   #+end_src
+
+   If we're on a machine with =vmd(8)=, the following will add
+   completions for the subcommands and for the virtual machines:
+
+   #+begin_src sh
+     if pgrep -fq /usr/sbin/vmd; then
+	     set -A complete_vmctl_1 -- console load reload start stop reset \
+		 status send receive
+	     set -A complete_vmctl -- \
+		 $(vmctl status | awk '!/NAME/ { printf "%s ", $NF }')
+     fi
+   #+end_src
+
+   Completions for ifconfig are also nice:
+
+   #+begin_src sh
+     set -A complete_ifconfig_1 -- $(ifconfig | grep ^[a-z] | cut -d: -f1)
+   #+end_src
+
+   Add some for Got and Git:
+
+   #+begin_src sh
+     set -A complete_got_1 --	\
+	     bl blame		\
+	     bo backout		\
+	     br branch		\
+	     ci commit		\
+	     co checkout		\
+	     cy cherrypick		\
+	     di diff			\
+	     he histedit		\
+	     im import		\
+	     in init			\
+	     log			\
+	     rb rebase		\
+	     ref			\
+	     rm remove		\
+	     rv revert		\
+	     sg stage		\
+	     st status		\
+	     tr tree			\
+	     ug unstage		\
+	     up update
+
+     set -A complete_git_1 --				\
+	     checkout cherry-pick clean clone commit config	\
+	     mpull mpush					\
+	     pull push					\
+	     status
+   #+end_src
+
+** Aliases
+
+   Some misc aliases:
+
+   #+begin_src sh
+     alias ls="ls -F"
+     alias serve="python3 -m http.server"
+     alias ec='emacsclient -nw -c'
+
+     # colors ain't welcome here!
+     alias nim="nim --colors=off"
+   #+end_src
+
+** misc functions
+
+   What follows are functions that aren't big enough to be worth a
+   whole file.
+
+   I think I stealed this two from someone.  They make a backup copy
+   of the file and then launch an editor on that, super useful when
+   porting.  The first uses =mg= and elevates the privileges with =doas=
+
+   #+begin_src sh
+     mgdiff()
+     {
+	     if [ -z "$1" ]; then
+		     printf "%s\n" "USAGE: mgdiff <file>" >&2
+		     return
+	     fi
+	     doas cp -p "$1" "$1.orig"
+	     doas mg "$1"
+     }
+
+   #+end_src
+
+   The second one uses =vi= without =doas=:
+
+   #+begin_src sh
+     vdiff()
+     {
+	     if [ -z "$1" ]; then
+		     printf "%s\n" "USAGE: vdiff <file>" >&2
+		     return
+	     fi
+	     cp -p "$1" "$1.orig"
+	     vi "$1"
+     }
+   #+end_src
+
+   =hist= is a quick wrapper around =history= and =grep=, to quickly
+   search for a previous command:
+
+   #+begin_src sh
+     hist()
+     {
+	     if [ -z "$1" ]; then
+		     printf "%s\n" "USAGE: hist <pattern>" >&2
+		     return 1
+	     fi
+
+	     history 0 | grep "$1"
+     }
+   #+end_src
+
+   =nnn= is a quick and useful file manager for the terminal.  One
+   useful feature is "auto-cd", where one can navigate the filesystem
+   with =nnn= and upon exit, the shell will change directory to the
+   last visited.  It's pretty simple to setup, albeit probably prone
+   to races.  While there, also define some bookmarks:
+
+   #+begin_src sh
+     export NNN_BMS="h:$HOME;t:/tmp"
+     export NNN_USE_EDITOR=1
+
+     bind -m '^O'='^U ncd^J^Y'
+
+     ncd()
+     {
+	     # block nesting of nnn in subshells
+	     if [ "${NNNLVL:-0}" -ge 1 ]; then
+		     echo nnn is aready running
+		     return
+	     fi
+
+	     export NNN_TMPFILE=$HOME/.config/nnn/.lastd
+
+	     nnn "$@"
+
+	     if [ -f "$NNN_TMPFILE" ]; then
+		     . "$NNN_TMPFILE"
+		     rm "$NNN_TMPFILE"
+	     fi
+     }
+   #+end_src
+
+   =goman= is a small wrapper to invoke =go doc= with a pager, which
+   is useful when reading documentation on xterm:
+
+   #+begin_src sh
+     goman()
+     {
+	     if [ -z "$1" ]; then
+		     echo "USAGE: goman terms..." >&2
+		     return 1
+	     fi
+
+	     go doc "$@" | ${MANPAGER:-less}
+     }
+   #+end_src
+
+   =rebuild_gerbil_doc= rebuilds the website with the gerbil
+   documentation from the source shipped with the package into
+   =/var/www/cons.local=
+
+   #+begin_src sh
+     rebuild_gerbil_doc()
+     {
+	     rm -rf /tmp/build_gerbil_doc
+	     mkdir /tmp/build_gerbil_doc || return 1
+	     cp -R /usr/local/gerbil/doc /tmp/build_gerbil_doc/ || return 1
+	     cd /tmp/build_gerbil_doc/doc/
+	     ./build.sh || return 1
+	     rm -rf /var/www/cons.local/*
+	     cp -R .vuepress/dist/* /var/www/cons.local/
+     }
+   #+end_src
+
+** porting-related
+
+   One of these days I'll spend some time to split and document each
+   bit, and maybe drop unused stuff
+
+   #+begin_src sh
+     # ports stuff
+     alias portsql='sqlite3 /usr/local/share/sqlports'
+     alias portslol='make 2>&1 | /usr/ports/infrastructure/bin/portslogger .'
+     alias portspldc='make port-lib-depends-check'
+     alias portsldc='make lib-depends-check'
+     alias portsplif='diff -up pkg/PLIST.orig pkg/PLIST'
+     alias portstsilp='mv pkg/PLIST.orig pkg/PLIST'
+     alias portspy3plist='FLAVOR=python3 make plist'
+     alias portsrc='cd `make show=WRKSRC`'
+     alias portsfast='MAKE_JOBS=6 make'
+
+     portsdiff() { cvs diff > /usr/ports/mystuff/${PWD##*/}.diff  ; less /usr/ports/mystuff/${PWD##*/}.diff ;}
+     portslessdiff() { less /usr/ports/mystuff/${PWD##*/}.diff  ; }
+     # portscp() { scp /usr/ports/mystuff/${PWD##*/}.diff virtie:/var/www/iota/ports/ && echo https://chown.me/iota/ports/${PWD##*/}.diff ;}
+     portspy3() { FLAVOR="python3" make "$@" ;}
+     portspy3and2() { make "$@" ; FLAVOR="python3" make "$@" ;}
+     portspygrep() { (cd /usr/ports && grep "$@" */py-*/Makefile ) ;}
+     portslib() { nm -g "$1" | cut -c10- | grep -e^T > /tmp/"$(pwd |xargs basename)" ;}
+     portsfind() { find /usr/ports -iname "${1}" -exec grep -iH ${2} {} \; ;}
+     portsgrep() { ( cd /usr/ports && grep "$@" */*/Makefile */*/*/Makefile ) ;}
+
+     alias mup="make update-patches"
+     alias pfast="MAKE_JOBS=7 make"
+     alias m="make"
+     alias mpldc="make port-lib-depends-check"
+
+     pclear()
+     {
+	     doas find /usr/ports/packages/ -iname "*${1:?}*" -delete
+	     doas find /usr/ports/plist/ -iname "*${1:?}*" -delete
+     }
+   #+end_src
+
+* rc
+  Although it's not my interactive shell, I do like plan9' rc.
+
+  My configuration file is pretty small:
+
+  #+begin_src sh :tangle ~/lib/profile
+    prompt=('% ' '')
+    user=$USER
+    home=$HOME
+
+    fn % { $* }
+    fn git { env git --no-pager $* }
+  #+end_src
+
+  I use the following for the plumber, although it probably can be
+  improved:
+
+  #+begin_src conf :tangle ~/lib/plumbing
+    addr=':(#?[0-9]+)'
+    protocol='(https?|ftp|file|gopher|mailto|news|nntp|telnet|wais)'
+    domain='[a-zA-Z0-9_@]+([.:][a-zA-Z0-9_@]+)*/?[a-zA-Z0-9_?,%#~&/\-]+'
+    file='([:.][a-zA-Z0-9_?,%#~&/\-]+)*'
+
+    # open http urls.  data regexps is the same for file plus :
+    type is text
+    data matches $protocol://$domain$file
+    plumb to web
+    plumb start web $0
+
+    # RFC's from one of the nicer-looking repositories.
+    type is text
+    data matches 'RFC:([0-9]+)'
+    plumb to web
+    plumb start browser https://tools.ietf.org/html/rfc$1
+
+    # open python error message
+    type is text
+    data matches ' *File "([a-zA-Z0-9_\.\/]*)", line ([0-9]*).*'
+    plumb to edit
+    arg isfile $1
+    data set $file
+    attr add addr=$2
+    plumb client $editor
+
+    # open pdf with xdg-open
+    type is text
+    data matches '[a-zA-Z¡-￿0-9_\-./]+'
+    data matches '([a-zA-Z¡-￿0-9_\-./]+)\.(ps|PS|eps|EPS|pdf|PDF|dvi|DVI)'
+    arg isfile $0
+    plumb to postscript
+    plumb start xdg-open $file
+
+    # show git log
+    type is text
+    data matches 'commit ([a-z0-9]*)'
+    arg isdir .
+    data set $dir
+    plumb start sh -c 'cd '$dir'; git show '$1' | 9p write acme/new/body'
+
+    # show git log
+    type is text
+    data matches 'commit ([a-z0-9]*)'
+    arg isdir .
+    data set $dir
+    plumb start sh -c 'cd '$dir'; git show '$1' | 9p write acme/new/body'
+
+    # git pull
+    type is text
+    data matches '.*[pP][uU][lL][lL].*#([0-9]*)'
+    arg isdir .
+    data set $dir
+    plumb start sh -c 'cd '$dir'; browser $(git remote get-url origin | sed "s/\.git//")/pull/'$1
+
+    # git issue
+    type is text
+    data matches '[iI][sS][sS][uU][eE] #([0-9]*)'
+    arg isdir .
+    data set $dir
+    plumb start sh -c 'cd '$dir'; browser $(git remote get-url origin | sed "s/\.git//")/issues/'$1
+
+    # git issue
+    type is text
+    data matches '.*fix.*#([0-9]*)'
+    arg isdir .
+    data set $dir
+    plumb start sh -c 'cd '$dir'; browser $(git remote get-url origin | sed "s/\.git//")/issues/'$1
+  #+end_src
+
+* Scripts
+** acmerc
+   I use the following script to launch acme in all its glory.
+
+   #+begin_src sh :tangle ~/bin/acmerc :tangle-mode (identity #o755)
+     #!/usr/bin/env rc
+
+     . $home/lib/profile
+
+     if (~ $PLAN9 '') {
+	     echo '$PLAN9 is not defined!'
+	     exit 1
+     }
+
+     NAMESPACE=/tmp/ns.$user.$pid
+
+     SHELL=rc
+     PAGER=nobs
+     MANPAGER=nobs
+     EDITOR=editinacme
+     VISUAL=editinacme
+
+     mkdir -p $"NAMESPACE
+
+     plumber
+     fontsrv &
+     fontsrvpid=$apid
+
+     font=/mnt/font/GoMono/10a/font
+     FONT=/mnt/font/InputSans-Regular/10a/font
+
+     $PLAN9/bin/acme -a -f $font -F $FONT $* &
+     acmepid=$apid
+
+     {
+	     sleep 1
+	     winid=1
+	     exec acmeeval 'autoacme '$home'/bin/acmeconfig'
+     } &
+     acmeevalpid=$apid
+
+     wait $acmepid
+
+     kill $acmeevalpid
+     kill $fontsrvpid
+
+     wait # just in case
+
+     rm -rf $"NAMESPACE
+   #+end_src
+** browser
+   The =browser= script is my default browser.  It launches the
+   correct browser depending on what is currently running
+
+   #+begin_src sh :tangle ~/bin/browser :tangle-mode (identity #o755)
+     #!/bin/sh
+
+     if pgrep firefox >/dev/null 2>&1; then
+	     exec firefox "$1"
+     fi
+
+     if pgrep iridium >/dev/null 2>&1; then
+	     exec iridium "$1"
+     fi
+
+     exec firefox "$1"
+   #+end_src
+
+** clbin
+   Posts its input to clbin
+
+   #+begin_src sh :tangle ~/bin/clbin :tangle-mode (identity #o755)
+     #!/bin/sh
+
+     exec curl -F 'clbin=<-' https://clbin.com
+   #+end_src
+
+** menu
+   This generates a menu for a =dmenu= like program.  In particular,
+   it uses my own mymenu.
+
+   #+begin_src sh :tangle ~/bin/menu :tangle-mode (identity #o755)
+     #!/bin/ksh
+
+     a-menu() {
+	     mymenu -f 'Go Mono-11' -l vertical -p '% ' \
+		    -W 50% -H 30% -P 10 -x center -y center \
+		    -C '#ffffea' -c '#000' -T '#ffffea' \
+		    -t '#000' -S '#000' -s '#fff' -b 3 \
+		    -a
+     }
+
+     # pass
+     p() {
+	     prefix=${PASSWORD_STORE_DIR:-~/.password-store}
+	     typeit=${1:-no}
+
+	     sleep 1
+	     p=$(find "$prefix" -type f -iname '*.gpg' | \
+		     sort | \
+		     sed -e 's/\.gpg$//' -e "s,^$prefix/,," | \
+		     a-menu)
+	     if [ $? -eq 0 ]; then
+		     if [ "$typeit" = yes ]; then
+			     pass show "$p" | { IFS= read -r pass; printf %s "$pass"; } |
+				     xdotool type --clearmodifiers --file -
+		     else
+			     pass show --clip "$password"
+		     fi
+	     fi
+     }
+
+     # exec
+     e() {
+	     if ! x=$(a-menu); then
+		     return
+	     elif [ "$x" = "pass" ]; then
+		     p yes
+	     elif [ "$x" = "pass copy" ]; then
+		     p nope
+	     elif [ "$x" = "keep" ]; then
+		     exec keepassxc
+	     else
+		     exec $x
+	     fi
+     }
+
+     (
+
+	     echo audacity
+	     echo blender
+	     echo chrome
+	     echo dino
+	     echo emacs
+	     echo emacsclient -c
+	     echo firefox
+	     echo gajim
+	     echo gimp
+	     echo godot
+	     echo inkscape
+	     echo iridium
+	     echo keep
+	     echo lagrange
+	     echo libreoffice
+	     echo lmms
+	     echo luakit
+	     echo lxappearance
+	     echo mumble
+	     echo netsurf-gtk3
+	     echo obs
+	     echo pass
+	     echo pass copy # not "copy pass" so it's after pass
+	     echo pixelorama
+	     echo poedit
+	     echo spectral
+	     echo tor-browser
+	     echo xfe
+
+     ) | e
+   #+end_src
+
+** record
+   Record, as the name suggest, records a portion of the screen to a
+   file.
+
+   #+begin_src sh :tangle ~/bin/record :tangle-mode (identity #o755)
+     #!/bin/ksh
+
+     if ! s=$(slop -f "%x %y %w %h"); then
+	     exit 1
+     fi
+
+     set -A s -- $s
+
+     x=${s[0]}
+     y=${s[1]}
+     w=${s[2]}
+     h=${s[3]}
+
+     exec ffmpeg -y \
+	     -f x11grab \
+	     -s ${w}x${h} \
+	     -framerate 30 \
+	     -i $DISPLAY+${x},${y} \
+	     ${1:?missing output file}
+   #+end_src
+
+** stumpwm-wrapper
+
+   I like to jump between stumpwm and cwm, but I haven't found a way
+   to do =exec cwm= from lisp, hence I'm using this script from =cwm=
+   to switch to =stumpwm=.
+
+   #+begin_src sh :tangle ~/bin/stumpwm-wrapper :tangle-mode (identity #o755)
+     #!/bin/sh
+
+     stumpwm
+     exec cwm
+   #+end_src
