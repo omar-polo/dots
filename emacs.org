@@ -3,7 +3,7 @@
 #+PROPERTY: header-args :tangle ~/.emacs.d/init.el
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
 
-Behold, this is my emacs configuration.  Here be dragons.
+Here be dragons.
 
 * early-init.el
   Starting from emacs 27 (I guess) there is an additional
