@@ -1521,7 +1521,7 @@ Here be dragons.
     #+end_src
 *** eglot
     LSP stands for =Language Something Protocol=, developed by M$ for
-    vs-code, but − trust me, it's weird to say it − it seems a
+    vs-code, but − bear with me, it's weird to say it − it seems a
     /decent/ idea.
 
     There are two major implementations for emacs: =lsp-mode= and
@@ -1535,15 +1535,24 @@ Here be dragons.
                     ("<f2>" . eglot-format))
         :config
         (add-to-list 'eglot-server-programs
-                     '(c-mode . ("clangd" "--header-insertion=never")))
-
-        ;; get rid of the highlighting when I'm hovering a symbol
-        (add-to-list 'eglot-ignored-server-capabilites
-                     :documentHighlightProvider))
+                     '(c-mode . ("clangd" "--header-insertion=never"))))
     #+end_src
 
     =clangd= has an annoying "feature": it automatically adds include
     when it thinks they're needed.
+
+    Additionally, various LSP backend (at least =gopls=) like to
+    highlight the symbol at point in the buffer, which gets super
+    annoying, it turns your buffer into some sort of Christmas tree
+    every time you move the point around.  Eglot has the concept of
+    "ignored server capabilities" where it would /fake/ to understand
+    some capabilities, but don't actually apply them.
+
+    #+begin_src emacs-lisp
+      (with-eval-after-load 'eglot
+        (add-to-list 'eglot-ignored-server-capabilites
+                     :documentHighlightProvider))
+    #+end_src
 
     Protip: when working on a C project, one needs a
     =compile-commands.json= file.  But, most of the time, a simple
