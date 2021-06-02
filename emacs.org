@@ -2040,6 +2040,7 @@ Here be dragons.
        :custom ((eshell-compl-dir-ignore
                  "\\`\\(\\.\\.?\\|CVS\\|\\.svn\\|\\.git\\|\\.got\\)/\\'")
                 (eshell-save-history-on-exit t)
+                (eshell-prompt-regexp "[#$] ")
                 (eshell-prompt-function (lambda () "$ ")))
        :config
        (defun eshell/emacs (&rest args)
