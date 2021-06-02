@@ -1,0 +1,12 @@
+#+TITLE Dotfiles
+
+#+begin_quote
+there's no place like ~/
+#+end_quote
+
+This is my attempt at a literate configuration for all my stuff.
+There are various =*.org= files that will tangle to config files in
+various places.
+
+Files:
+ - [[file:emacs.org][emacs configuration]]
