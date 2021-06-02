@@ -203,9 +203,11 @@ Here be dragons.
          (C . t)
          (R . t)
          (sql . t)
+         (lisp . t)
          (shell . t)
          (python . t)
          (gnuplot . t)))
+      (setq org-babel-lisp-eval-fn #'sly-eval)
 
       ;; NOTE: needs sqlite3
       (use-package org-roam
