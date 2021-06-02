@@ -25,6 +25,16 @@ bits of code.
     '())
 #+end_src
 
+One drawbacks of using a /literate/ init file is that customisation
+get lost every time it get tangled, because they're usually appended
+at the end of the =user-init-file=.  The simplest solution I found is
+to move the custom stuff in another file, so it gets persisted:
+
+#+begin_src emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (load custom-file)
+#+end_src
+
 * early-init.el
   It's strange to start with the top of the =init.el= and then talk
   about the =early-init.el=, isn't it?  Well, that's how thing goes.
