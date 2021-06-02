@@ -1498,7 +1498,6 @@ Here be dragons.
                                    beg end)))))))
    #+end_src
 ** Languages
-*** LISP-y stuff
 *** jump to matching paren
     The idea behind this is really cool.  Pressing =%= with the cursor
     on (or before) a parenthesis (of any kind) will jump to the other
