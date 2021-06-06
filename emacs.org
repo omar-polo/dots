@@ -461,6 +461,15 @@ Here be dragons.
          "Open URL with `elpher-go'."
          (elpher-go url)))
    #+end_src
+** variable pitch mode (aka non monospace)
+   I like to use =variable-pitch-mode= in some text buffers (org and
+   gemini usually), but sometimes I'd like a way to toggle it.  While
+   =M-x variable-pitch-mode RET= is a solution, binding a key is
+   faster:
+
+   #+begin_src emacs-lisp
+     (define-key global-map (kbd "C-z V") #'variable-pitch-mode)
+   #+end_src
 * Minibuffer
   #+begin_quote
   all hail the minibuffer
@@ -665,7 +674,7 @@ Here be dragons.
                  (op/split-window-sensibly window)
                (split-window-sensibly window))))))
    #+end_src
-** Placement
+** Placement with shackle
    #+begin_src emacs-lisp
      (use-package shackle
        :custom
@@ -704,7 +713,8 @@ Here be dragons.
                    :align below
                    :select t
                    :size 0.3))))
-        (shackle-default-rule '(:inhibit-window-quit t)))
+        (shackle-default-rule nil ; '(:inhibit-window-quit t)
+                              ))
        :config (shackle-mode))
    #+end_src
 ** History
@@ -2295,6 +2305,20 @@ Here be dragons.
              (load "my-mu4e-config")
              (message "after load"))
          (error (message "NOT loading mu4e configuration.  It's missing!"))))
+   #+end_src
+** pass
+   I've recently switched to the =pass= password manager.  It stores
+   every password in a gpg-encrypted file inside a git repository,
+   it's quite neat.  My personal naming scheme is something along the
+   lines of
+
+   #+begin_src text :tangle no
+     <category/service>/<optional sub-specifier>/<account-name>
+   #+end_src
+
+   #+begin_src emacs-lisp
+     (use-package pass
+       :bind (("C-z P" . pass)))
    #+end_src
 ** vmd
    I wrote a [[https://github.com/omar-polo/vmd.el/][small package]] to interact with =vmd(8)= on OpenBSD.  It's
