@@ -213,11 +213,11 @@ Here be dragons.
       (use-package org-roam
         :custom ((org-roam-directory "~/org-roam"))
         :hook ((after-init . org-roam-mode))
-        :bind (("<f6> o" . org-roam-capture)
-               ("<f6> u" . org-roam-find-file)
-               ("<f6> e" . org-roam)
+        :bind (("C-z r o" . org-roam-capture)
+               ("C-z r u" . org-roam-find-file)
+               ("C-z r e" . org-roam)
                :map org-roam-mode-map
-               ("<f6> O" . org-roam-insert))
+               ("C-z r O" . org-roam-insert))
         :config
         (comment
          (make-directory org-roam-directory))))
@@ -469,6 +469,19 @@ Here be dragons.
 
    #+begin_src emacs-lisp
      (define-key global-map (kbd "C-z V") #'variable-pitch-mode)
+   #+end_src
+** form-feed
+   The =form-feed= ASCII character (0x0C or 12) was used to signal the
+   end of the page.  It's still used (albeit not that frequently) in
+   code to divide a file into logical "pages".
+
+   The [[https://depp.brause.cc/form-feed/][=form-feed=]] packages changes how these =^L= characters are
+   rendered, it turns them into a line spanning the entire window
+   width.
+
+   #+begin_src emacs-lisp
+     (use-package form-feed
+       :config (global-form-feed-mode))
    #+end_src
 * Minibuffer
   #+begin_quote
