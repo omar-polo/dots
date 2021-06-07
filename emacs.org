@@ -205,6 +205,7 @@ Here be dragons.
          (sql . t)
          (lisp . t)
          (shell . t)
+         (sqlite . t)
          (python . t)
          (gnuplot . t)))
       (setq org-babel-lisp-eval-fn #'sly-eval)
@@ -2066,7 +2067,7 @@ Here be dragons.
    =C-c C-B= uses the minibuffer to select a buffer and insert the
    eshell code to append that command output to the selected buffer.
 
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp :noweb no-export
      (use-package eshell
        :bind (("C-c e" . op/eshell))
        :hook (eshell-mode . op/setup-eshell)
@@ -2112,16 +2113,48 @@ Here be dragons.
                 (eshell-buffer-name (op/eshell-bufname dir)))
            (eshell)))
 
-       (defun op/append-to-buffer (buf)
-         (interactive "Bbuffer: ")
-         (insert ">>> " "#<" buf ">"))
+       <<op/append-to-buffer>>
+
+       <<op/eshell-narrow-to-output>>
 
        ;; eshell has this thing where sets eshell-mode-map as
        ;; buffer-local...  just why?
        (defun op/setup-eshell ()
-         (define-key eshell-mode-map (kbd "C-c C-B") #'op/append-to-buffer)))
+         (define-key eshell-mode-map (kbd "C-c C-B") #'op/append-to-buffer)
+         (define-key eshell-mode-map (kbd "C-c M-l") #'op/eshell-narrow-to-output)))
    #+end_src
 
+   Eshell can interact with other Emacs buffers, but the syntax is
+   quite verbose.  =op/append-to-buffer= (bound to =C-c C-B=) helps
+   with this: it prompts for a buffer and inserts (but not execute)
+   the redirect.  This is especially useful when working with the
+   OpenBSD ports tree: I can type =cvs -q diff= and then =C-c C-B= to
+   redirect the diff to the mail buffer!
+
+   #+NAME: op/append-to-buffer
+   #+begin_src emacs-lisp :tangle no
+     (defun op/append-to-buffer (buf)
+       (interactive "Bbuffer: ")
+       (insert ">>> " "#<" buf ">"))
+   #+end_src
+
+   Being able to narrow to the output of the command at point seems
+   very useful, so here's a quick implementation:
+
+   #+NAME: op/eshell-narrow-to-output
+   #+begin_src emacs-lisp :tangle no
+     (defun op/eshell-narrow-to-output ()
+       "Narrow to the output of the command at point."
+       (interactive)
+       (save-excursion
+         (let* ((start (progn (eshell-previous-prompt 1)
+                              (forward-line +1)
+                              (point)))
+                (end (progn (eshell-next-prompt 1)
+                            (forward-line -1)
+                            (point))))
+           (narrow-to-region start end))))
+   #+end_src
 
 *** TODO make =>>>= ignore =stderr=
 
