@@ -1,4 +1,6 @@
-#+TITLE Dotfiles
+#+TITLE: Dotfiles
+#+EXPORT_FILE_NAME: index
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
 
 #+begin_quote
 there's no place like ~/
@@ -10,3 +12,4 @@ various places.
 
 Files:
  - [[file:emacs.org][emacs configuration]]
+ - [[file:shells.org][shells & co]]
