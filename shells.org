@@ -121,8 +121,8 @@
     export TREE_COLORS=no
   #+end_src
 
-  Then disable the colors in the boot (a clojure build tool I'm not
-  using anymore) and fix its =gpg= command:
+  Then disable the colors in boot (a clojure build tool I'm not using
+  anymore) and fix its =gpg= command:
 #+begin_src sh
   export BOOT_COLOR=no
   export BOOT_GPG_COMMAND=gpg2
@@ -651,6 +651,59 @@
     plumb start sh -c 'cd '$dir'; browser $(git remote get-url origin | sed "s/\.git//")/issues/'$1
   #+end_src
 
+* SQLite
+    :PROPERTIES:
+    :header-args: :tangle ~/.sqliterc
+    :END:
+
+    SQLite has a configuration file that gets executed every time is
+  launched.  I like to change the default glyph for the =NULL= value
+
+  #+begin_src conf
+    .nullvalue '⊥'
+  #+end_src
+
+  and enable the =box= mode.  This is kinda new, so it may not work in
+  some older version
+
+  #+begin_src conf
+    .mode box
+  #+end_src
+
+  It looks like this:
+
+  #+begin_src sqlite :tangle no :db "" :results verbatim :exports both
+    .mode box
+    select 42 as response;
+  #+end_src
+
+  #+RESULTS:
+  | ┌──────────┐ |
+  | │ response │ |
+  | ├──────────┤ |
+  | │ 42       │ |
+  | └──────────┘ |
+
+* psql
+    :PROPERTIES:
+    :header-args: :tangle ~/.psqlrc
+    :END:
+
+  By default psql renders =NULL= values as empty strings.  This makes
+  it harder to "see" if a column is =NULL= or an empty string, so
+  change the default =NULL= glyph:
+
+  #+begin_src conf
+    \pset null '⊥'
+  #+end_src
+
+  I also use to connect to databases to different hosts, so to be
+  extra sure I made =psql= print the connection info right away:
+
+  #+begin_src conf
+    \conninfo
+  #+end_src
+
 * Scripts
 ** acmerc
    I use the following script to launch acme in all its glory.
@@ -849,4 +902,29 @@
 
      stumpwm
      exec cwm
+   #+end_src
+
+** xdg-open
+   Time ago I decided to just stop even trying to tame =xdg-open= and
+   fix the problem at the root, that is, by getting rid of it.
+
+   I have an =xdg-open= scripts that implements the rules that *I*
+   want, not some coincidences decided by the order in which the
+   package were installed.
+
+   #+begin_src sh :tangle ~/bin/xdg-open :tangle-mode (identity #o755)
+     #!/bin/sh
+
+     case "$@" in
+	     ,*://*)		exec browser "$@" ;;
+	     ,*jpg|*jpeg)	exec gpicview "$@" ;;
+	     ,*mp4|*mkv)	exec mpv "$@" ;;
+	     ,*m4a)		exec mpv --force-window --lavfi-complex='[aid1] asplit [ao] [v] ; [v] showwaves=mode=line:split_channels=1 [vo]' "$@" ;;
+	     ,*pdf)		exec zathura "$@" ;;
+	     ,*svg)		exec inkscape "$@" ;;
+	     ,*core)		;; # do nothing
+	     ,*png|jpeg|gif)	exec gpicview "$@" ;;
+	     ,*gif)		exec gpicview "$@" ;;
+	     ,*)		exec emacsclient -c "$@" ;;
+     esac
    #+end_src
