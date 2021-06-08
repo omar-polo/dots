@@ -598,18 +598,26 @@ Here be dragons.
    #+end_src
 
 ** Selectrum
-   #+begin_src emacs-lisp
-     (use-package selectrum
-       :custom ((selectrum-highlight-candidates-function #'orderless-highlight-matches)
-                (orderless-skip-highlighting (lambda () selectrum-is-active)))
-       :config
-       (selectrum-mode +1)
+   #+begin_src emacs-lisp :noweb no-export
+          (use-package selectrum
+            :custom ((selectrum-highlight-candidates-function #'orderless-highlight-matches)
+                     (orderless-skip-highlighting (lambda () selectrum-is-active)))
+            :config
+            (selectrum-mode +1)
 
-       ;; from embark wiki
-       (defun op/refresh-selectrum ()
-         (setq selectrum--previous-input-string nil))
-       (add-hook 'embark-pre-action-hook #'op/refresh-selectrum))
+            <<selectrum-embark>>)
    #+end_src
+
+   Unlike vertico, selectrum needs something more to integrate with
+   embark.  This is taken from the [[https://github.com/oantolin/embark/wiki/Additional-Configuration#selectrum][Embark wiki]]:
+
+   #+NAME: selectrum-embark
+   #+begin_src emacs-lisp :tangle no
+     (defun op/refresh-selectrum ()
+       (setq selectrum--previous-input-string nil))
+     (add-hook 'embark-pre-action-hook #'op/refresh-selectrum)
+   #+end_src
+
 ** embark
    Embark provides custom actions on the minibuffer (technically
    everywhere, but I only use it in the minibuffer.)
@@ -1918,14 +1926,14 @@ Here be dragons.
         (newline)
         (c-indent-line))
 
-      (with-eval-after-load 'c-mode
+      (with-eval-after-load 'cc-mode
         (define-key c-mode-map (kbd "M-RET") #'op/open-line-under))
     #+end_src
 
     Use some similar (but slightly different) smartparens key and
     reserve a key for =recompile=.
     #+begin_src emacs-lisp
-      (with-eval-after-load 'c-mode-map
+      (with-eval-after-load 'cc-mode
         (let ((map c-mode-map))
           (define-key map (kbd "<tab>")   #'indent-for-tab-command)
           (define-key map (kbd "TAB")     #'indent-for-tab-command)
