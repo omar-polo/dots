@@ -587,9 +587,28 @@ Here be dragons.
    by the same author of consult, so at this point I thought of
    keeping the streak and using this
 
+   <2021-06-08 Tue> vertico is *too damn slow* here: =M-x= halts emacs
+   for like 3-4 seconds before any UI show up. I should spend some
+   time profiling it, but for the time being switch back to [[*Selectrum][Selectrum]].
+
    #+begin_src emacs-lisp
-     (use-package vertico
-       :config (vertico-mode))
+     (comment
+      (use-package vertico
+        :config (vertico-mode)))
+   #+end_src
+
+** Selectrum
+   #+begin_src emacs-lisp
+     (use-package selectrum
+       :custom ((selectrum-highlight-candidates-function #'orderless-highlight-matches)
+                (orderless-skip-highlighting (lambda () selectrum-is-active)))
+       :config
+       (selectrum-mode +1)
+
+       ;; from embark wiki
+       (defun op/refresh-selectrum ()
+         (setq selectrum--previous-input-string nil))
+       (add-hook 'embark-pre-action-hook #'op/refresh-selectrum))
    #+end_src
 ** embark
    Embark provides custom actions on the minibuffer (technically
