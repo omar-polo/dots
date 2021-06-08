@@ -339,7 +339,17 @@ Here be dragons.
 
     (define-key global-map (kbd "C-!") #'op/digit-argument-zero)
   #+end_src
+** Font
+   I discovered this font thanks to a submission on the ports@ mailing
+   list.  I'm just trying it for now, I'm not sure if I really like it.
 
+   #+begin_src emacs-lisp
+     (let ((font "mononoki"))
+       (add-to-list 'default-frame-alist `(font . ,font))
+       (set-face-attribute 'default t :font font)
+       (set-face-attribute 'default nil :font font)
+       (set-frame-font font nil t))
+   #+end_src
 ** tab-bar
    I initially thought I would never used the =tab-bar=, but now here
    we are.  How ironic.  Anyway, please don't show the tab-bar when
