@@ -110,6 +110,26 @@ Here be dragons.
     (load custom-file)
   #+end_src
 
+  <2021-06-12 Sat> =$CDPATH= produce strange effects on eshell
+
+  #+begin_src sh :tangle no
+    $ echo $CDPATH
+    .:/home/op/w:/usr/ports:/usr/ports/mystuff:/home/op/quicklisp/local-projects
+    $ pwd
+    ~
+    $ cd .
+    $ pwd
+    ~/.emacs.d/
+    $ wtf?
+  #+end_src
+
+  So just disable it for the time being.  It's not particularly useful
+  inside eshell anyway
+
+  #+begin_src emacs-lisp
+    (setenv "CDPATH" nil)
+  #+end_src
+
 * straight
   I'm currently using =straight.el= and =use-package= to manage
   external packages.  It makes easy to pull packages from git, so one
@@ -140,7 +160,7 @@ Here be dragons.
   One day I'll split this manegeable chunks, but today it's not that
   day.
 
-  #+begin_src emacs-lisp
+  #+begin_src emacs-lisp :noweb no-export
     (use-package org
       :straight nil
       :bind (("C-c c" . org-capture)
@@ -210,18 +230,7 @@ Here be dragons.
          (gnuplot . t)))
       (setq org-babel-lisp-eval-fn #'sly-eval)
 
-      ;; NOTE: needs sqlite3
-      (use-package org-roam
-        :custom ((org-roam-directory "~/org-roam"))
-        :hook ((after-init . org-roam-mode))
-        :bind (("C-z r o" . org-roam-capture)
-               ("C-z r u" . org-roam-find-file)
-               ("C-z r e" . org-roam)
-               :map org-roam-mode-map
-               ("C-z r O" . org-roam-insert))
-        :config
-        (comment
-         (make-directory org-roam-directory))))
+      <<org-roam>>)
   #+end_src
 
   I'm having some problems with org, in particular =C-c C-e ...=
@@ -252,43 +261,72 @@ Here be dragons.
 
 **** TODO wasn't valign included into ELPA?
 
+** org-roam
 
-**** Org publish
-     Org publish is a library that allows to generate sets of
-     documents from a directory tree.  It provides some basic
-     mechanisms to copy files around, converting org files to other
-     formats (HTML for instance).  I know some people use it to
-     generate static websites, I'm using it to publish my =dots= repo
-     on the web (and soon on Gemini!)
+   #+NAME: org-roam
+   #+begin_src emacs-lisp :tangle no
+     ;; NOTE: needs sqlite3
+     (use-package org-roam
+       :custom ((org-roam-directory "~/org-roam")
+                (org-roam-capture-templates
+                 (let ((file-name "%<%Y%m%d%H%M%S>-${slug}"))
+                   `(("d" "default" plain #'org-roam-capture--get-point
+                      "%?"
+                      :file-name ,file-name
+                      :head "#+title: ${title}\n"
+                      :unnarrowed t)
+                     ("l" "link" plain #'org-roam-capture--get-point
+                      "%?"
+                      :file-name ,file-name
+                      :head "#+title: ${title}\n#+roam_tags: \n#+roam_key: %x\n")))))
+       :hook ((after-init . org-roam-mode))
+       :bind (("C-z r o" . org-roam-capture)
+              ("C-z r u" . org-roam-find-file)
+              ("C-z r e" . org-roam)
+              :map org-roam-mode-map
+              ("C-z r O" . org-roam-insert))
+       :config
+       (comment
+        (make-directory org-roam-directory)))
+   #+end_src
 
-     The variable =org-publish-project-alist= as an alist of
-     =("name" props...)=.
+** Org publish
+   Org publish is a library that allows to generate sets of
+   documents from a directory tree.  It provides some basic
+   mechanisms to copy files around, converting org files to other
+   formats (HTML for instance).  I know some people use it to
+   generate static websites, I'm using it to publish my =dots= repo
+   on the web (and soon on Gemini!)
 
-     To publish org files as another file and copy files as-is, the
-     best way I found is to define multiple targets, one for org and
-     one for the copy, and require with the =:components= props from
-     another target.
+   The variable =org-publish-project-alist= as an alist of
+   =("name" props...)=.
 
-     #+begin_src emacs-lisp
-       (with-eval-after-load 'org
-         (setq org-publish-project-alist
-               '(("dots-org"
-                  :base-directory "~/dots"
-                  :base-extension "org"
-                  :publishing-directory "~/w/blog/resources/dots/"
-                  :recursive t
-                  :publishing-function org-html-publish-to-html)
-                 ("dots-static"
-                  :base-directory "~/dots"
-                  :base-extension "css\\|png\\|jpg\\|jpeg"
-                  :publishing-directory "~/w/blog/resources/dots/"
-                  :recursive t
-                  :publishing-function org-publish-attachment)
-                 ("dots" :components ("dots-org" "dots-static"))))
+   To publish org files as another file and copy files as-is, the
+   best way I found is to define multiple targets, one for org and
+   one for the copy, and require with the =:components= props from
+   another target.
 
-         (define-key global-map (kbd "C-z p p") #'org-publish)
-         (define-key global-map (kbd "C-z p P") #'org-publish-all))
-     #+end_src
+   #+begin_src emacs-lisp
+     (with-eval-after-load 'org
+       (setq org-publish-project-alist
+             '(("dots-org"
+                :base-directory "~/dots"
+                :base-extension "org"
+                :publishing-directory "~/w/blog/resources/dots/"
+                :recursive t
+                :publishing-function org-html-publish-to-html)
+               ("dots-static"
+                :base-directory "~/dots"
+                :base-extension "css\\|png\\|jpg\\|jpeg"
+                :publishing-directory "~/w/blog/resources/dots/"
+                :recursive t
+                :publishing-function org-publish-attachment)
+               ("dots" :components ("dots-org" "dots-static"))))
+
+       (define-key global-map (kbd "C-z p p") #'org-publish)
+       (define-key global-map (kbd "C-z p P") #'org-publish-all))
+   #+end_src
+
 * Misc
   The following are some misc customizations.  They can't be split in
   their own blocks, either because are variables defined in C or are
@@ -344,7 +382,7 @@ Here be dragons.
    list.  I'm just trying it for now, I'm not sure if I really like it.
 
    #+begin_src emacs-lisp
-     (let ((font "mononoki"))
+     (let ((font "mononoki 10"))
        (add-to-list 'default-frame-alist `(font . ,font))
        (set-face-attribute 'default t :font font)
        (set-face-attribute 'default nil :font font)
@@ -1115,7 +1153,129 @@ Here be dragons.
         (add-to-list 'vc-handled-backends 'Got)
         (add-to-list 'vc-directory-exclusion-list ".got"))
     #+end_src
-** Dired
+** Auto insert mode
+   =auto-insert-mode= is an elisp library that automatically inserts
+   text into new buffers based on the file extension or major mode.
+   For instance, trying to open a =.el= (Emacs LISP) file will insert
+   the entire GPL notice, and also other stuff.  This automatic insert
+   can be interactive, too.
+
+   #+begin_src emacs-lisp :noweb no-export
+     (add-hook 'after-init-hook #'auto-insert-mode)
+
+     (with-eval-after-load 'autoinsert
+       <<c-skeleton>>
+       <<go-skeleton>>
+       <<clojure-skeleton>>
+       <<perl-skeleton>>)
+   #+end_src
+
+   I prefer the ISC license, and tend to use that for almost all the C
+   I write:
+
+   #+NAME: c-skeleton
+   #+begin_src emacs-lisp :tangle no
+     (define-auto-insert '("\\.c\\'" . "C skeleton")
+       '("Description: "
+         "/*" \n
+         > "* Copyright (c) " (format-time-string "%Y") " " user-full-name " <" user-mail-address ">" \n
+         > "*" \n
+         > "* Permission to use, copy, modify, and distribute this software for any" \n
+         > "* purpose with or without fee is hereby granted, provided that the above" \n
+         > "* copyright notice and this permission notice appear in all copies." \n
+         > "*" \n
+         > "* THE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES" \n
+         > "* WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF" \n
+         > "* MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR" \n
+         > "* ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES" \n
+         > "* WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN" \n
+         > "* ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF" \n
+         > "* OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE." \n
+         > "*/" \n
+         \n
+         > _ \n
+         \n))
+   #+end_src
+
+   I added a skeleton for go files:
+
+   #+NAME: go-skeleton
+   #+begin_src emacs-lisp :tangle no
+     (define-auto-insert
+       '("\\.go\\'" . "Go skeleton")
+       '("Short description: "
+         "package "
+         (completing-read "Go package: "
+                          `("main" ,(file-name-nondirectory
+                                     (directory-file-name default-directory))))
+         \n \n > _ \n))
+   #+end_src
+
+   The clojure skeleton inserts the correct =ns= form at the top of
+   the buffer:
+
+   #+NAME: clojure-skeleton
+   #+begin_src emacs-lisp :tangle no
+     (defun op/cloj-ns ()
+       "Return the clojure namespace (as string) for the current file.
+     Stolen from the ``ns'' yasnippet from yasnippet-snippets."
+       (cl-flet ((try-src-prefix
+                  (path src-prfx)
+                  (let ((parts (split-string path src-prfx)))
+                    (when (= (length parts) 2)
+                      (cadr parts)))))
+         (let* ((p (buffer-file-name))
+                (p2 (cl-first
+                     (cl-remove-if-not #'identity
+                                       (mapcar (lambda (prfx)
+                                                 (try-src-prefix p prfx))
+                                               '("/src/cljs/" "/src/cljc/" "/src/clj/" "/src/" "/test/")))))
+                (p3 (file-name-sans-extension p2))
+                (p4 (mapconcat #'identity
+                               (split-string p3 "/")
+                               ".")))
+           (replace-regexp-in-string "_" "-" p4))))
+
+     (define-auto-insert
+       '("\\.\\(clj\\|cljs\\|cljc\\)\\'" . "Clojure skeleton")
+       '("Short description: "
+         "(ns " (op/cloj-ns) ")" \n \n
+         > _ \n))
+   #+end_src
+
+   #+NAME: perl-skeleton
+   #+begin_src emacs-lisp :tangle no
+     (define-auto-insert '("\\.pl\\'" . "Perl skeleton")
+       '("Name: "
+         "#!/usr/bin/env perl" \n
+         "#" \n
+         "# Copyright (c) " (format-time-string "%Y") " " user-full-name " <" user-mail-address ">" \n
+         "#" \n
+         "# Permission to use, copy, modify, and distribute this software for any" \n
+         "# purpose with or without fee is hereby granted, provided that the above" \n
+         "# copyright notice and this permission notice appear in all copies." \n
+         "#" \n
+         "# THE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES" \n
+         "# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF" \n
+         "# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR" \n
+         "# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES" \n
+         "# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN" \n
+         "# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF" \n
+         "# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE." \n
+         \n
+         "use v5.10;" \n
+         "use strict;" \n
+         "use warnings;" \n \n
+         _ \n \n
+         "__END__" "\n\n"
+         "=head1 NAME" "\n\n"
+         str "\n\n"
+         "=head1 SYNOPSIS" "\n\n\n"
+         "=head1 DESCRIPTION" "\n\n\n"
+         "=cut" "\n"))
+   #+end_src
+
+** DIRED
    By default dired will show, other than the files, also various
    other data about every file (like owner, permissions, ...) in a
    format similar to =ls -lah=.  This is indeed useful, but usually I
@@ -1794,7 +1954,8 @@ Here be dragons.
 
     #+begin_src emacs-lisp
       (use-package es-mode
-        :mode "\\.es\\'")
+        :mode "\\.es\\'"
+        :hook (es-mode . op/disable-tabs))
     #+end_src
 *** SQL
     =op/visit-new-migration-file= prompts for a name and creates an
