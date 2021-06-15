@@ -503,7 +503,7 @@
 		     return 1
 	     fi
 
-	     go doc "$@" | ${MANPAGER:-less}
+	     go doc "$@" 2>&1 | ${MANPAGER:-less}
      }
    #+end_src
 
