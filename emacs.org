@@ -2262,15 +2262,6 @@ Here be dragons.
    a full-blown elisp REPL like ielm, but neither a UNIX shell like
    =shell=.  It seems fun to use though.
 
-   I like to sync the =$PWD= with the buffer name, so an eshell in my
-   home has as buffer name =*eshell /home/op*=.
-
-   =cl= is a better clear function, because the built in =clear= is a
-   joke.
-
-   =C-c C-B= uses the minibuffer to select a buffer and insert the
-   eshell code to append that command output to the selected buffer.
-
    #+begin_src emacs-lisp :noweb no-export
      (use-package eshell
        :bind (("C-c e" . op/eshell))
@@ -2281,30 +2272,14 @@ Here be dragons.
                 (eshell-prompt-regexp "[#$] ")
                 (eshell-prompt-function (lambda () "$ ")))
        :config
-       (defun eshell/emacs (&rest args)
-         "Open a file in emacs (from the wiki)."
-         (if (null args)
-             (bury-buffer)
-           (mapc #'find-file
-                 (mapcar #'expand-file-name
-                         (eshell-flatten-list (nreverse args))))))
+       <<eshell/aliases>>
 
-       (defalias 'eshell/less #'find-file)
-
-       (defun eshell/dired ()
-         (dired (eshell/pwd)))
-
-       (defun eshell/cl ()
-         "Clear the eshell buffer."
-         (let ((inhibit-read-only t))
-           (erase-buffer)))
+       <<eshell/cl>>
 
        (defun op/eshell-bufname (dir)
          (concat "*eshell " (expand-file-name dir) "*"))
 
-       (defun op/eshell-after-cd (&rest _)
-         (rename-buffer (op/eshell-bufname default-directory) t))
-       (advice-add #'eshell/cd :after #'op/eshell-after-cd)
+       <<eshell/after-cd>>
 
        (defun op/eshell (arg)
          "Run or jump to eshell in the current project.
@@ -2312,8 +2287,7 @@ Here be dragons.
      buffer."
          (interactive "P")
          (let* ((proj (project-current))
-                (dir (cond (arg default-directory)
-                           (proj (project-root proj))
+                (dir (cond (proj (project-root proj))
                            (t default-directory)))
                 (default-directory dir)
                 (eshell-buffer-name (let ((name (op/eshell-bufname dir)))
@@ -2326,11 +2300,52 @@ Here be dragons.
 
        <<op/eshell-narrow-to-output>>
 
-       ;; eshell has this thing where sets eshell-mode-map as
-       ;; buffer-local...  just why?
-       (defun op/setup-eshell ()
-         (define-key eshell-mode-map (kbd "C-c C-B") #'op/append-to-buffer)
-         (define-key eshell-mode-map (kbd "C-c M-l") #'op/eshell-narrow-to-output)))
+       <<op/setup-eshell>>)
+   #+end_src
+
+   I like to sync the =$PWD= with the buffer name, so an eshell in my
+   home has as buffer name =*eshell /home/op*=.
+
+   <2021-06-16 Wed> Instead of =advice-add= I should use the
+   =eshell-directory-change-hook= hook.
+
+   #+NAME: eshell/after-cd
+   #+begin_src emacs-lisp :tangle no
+     (defun op/eshell-after-cd (&rest _)
+       (rename-buffer (op/eshell-bufname default-directory) t))
+
+     (advice-add #'eshell/cd :after #'op/eshell-after-cd)
+   #+end_src
+
+   To define custom commands in eshell (what would be functions or
+   scripts in other shells), say =whatever=, one can define a
+   =eshell/whatever= function.  These are some aliases I find useful:
+
+   #+NAME: eshell/aliases
+   #+begin_src emacs-lisp :tangle no
+     (defun eshell/emacs (&rest args)
+       "Open a file in emacs (from the wiki)."
+       (if (null args)
+           (bury-buffer)
+         (mapc #'find-file
+               (mapcar #'expand-file-name
+                       (eshell-flatten-list (nreverse args))))))
+
+     (defalias 'eshell/less #'find-file)
+
+     (defun eshell/dired ()
+       (dired (eshell/pwd)))
+   #+end_src
+
+   =cl= is a better clear function, because the built in =clear= is a
+   joke.
+
+   #+NAME: eshell/cl
+   #+begin_src emacs-lisp :tangle no
+     (defun eshell/cl ()
+       "Clear the eshell buffer."
+       (let ((inhibit-read-only t))
+         (erase-buffer)))
    #+end_src
 
    Eshell can interact with other Emacs buffers, but the syntax is
@@ -2363,6 +2378,25 @@ Here be dragons.
                             (forward-line -1)
                             (point))))
            (narrow-to-region start end))))
+   #+end_src
+
+   The weirdest thing about eshell is how it manages its own keys.
+   =eshell-mode-map=, unlike other =*-mode-map= variables, is
+   buffer-local, so a
+
+   #+begin_src emacs-lisp :tangle no
+     ;; just an example!
+     (define-key eshell-mode-map (kbd "...") #'some-function)
+   #+end_src
+
+   won't work.  One needs to define a function and call it during the
+   =eshell-mode-hook= like this:
+
+   #+NAME: op/setup-eshell
+   #+begin_src emacs-lisp :tangle no
+     (defun op/setup-eshell ()
+       (define-key eshell-mode-map (kbd "C-c C-B") #'op/append-to-buffer)
+       (define-key eshell-mode-map (kbd "C-c M-l") #'op/eshell-narrow-to-output))
    #+end_src
 
 *** TODO make =>>>= ignore =stderr=
