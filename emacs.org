@@ -2863,7 +2863,7 @@ Here be dragons.
        ;; contains something along the lines of
        ;;
        ;;   (setq rcirc-authinfo
-       ;;         '(("irc.freenode.net" nickserv
+       ;;         '(("irc.libera.chat" nickserv
        ;;            "USERNAME" "PASSWORD")))
        (condition-case nil
            (load "my-rcirc-conf")
