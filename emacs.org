@@ -1304,6 +1304,11 @@ Here be dragons.
    #+end_src
 
 ** Project
+   #+begin_src emacs-lisp :noweb no-export
+     (with-eval-after-load 'project
+       <<project-try-local>>)
+   #+end_src
+
    This is a bulit-in package to manage "projects" (that is, directory
    trees commonly called "projects")
 
@@ -1317,17 +1322,18 @@ Here be dragons.
    implementation for the project backend that consider a project
    something that has a =.project= file.
 
-   #+begin_src emacs-lisp
-     (with-eval-after-load 'project
-       (defun op/project-try-local (dir)
-         "Determine if DIR is a local project.
+   #+NAME: project-try-local
+   #+begin_src emacs-lisp :tangle no
+     (defun op/project-try-local (dir)
+       "Determine if DIR is a local project.
      DIR must include a .project file to be considered a project."
-         (when-let (root (locate-dominating-file dir ".project"))
-           (cons 'local root)))
-       (add-to-list 'project-find-functions #'op/project-try-local)
+       (when-let (root (locate-dominating-file dir ".project"))
+         (cons 'local root)))
 
-       (cl-defmethod project-root ((project (head local)))
-         (cdr project)))
+     (add-to-list 'project-find-functions #'op/project-try-local)
+
+     (cl-defmethod project-root ((project (head local)))
+       (cdr project))
    #+end_src
 
 *** TODO add some mechanism to ignore files
@@ -2301,14 +2307,19 @@ Here be dragons.
        (advice-add #'eshell/cd :after #'op/eshell-after-cd)
 
        (defun op/eshell (arg)
-         "Run eshell in the current project (or directory if ARG.)"
+         "Run or jump to eshell in the current project.
+     If called with a prefix argument ARG, always create a new eshell
+     buffer."
          (interactive "P")
          (let* ((proj (project-current))
                 (dir (cond (arg default-directory)
                            (proj (project-root proj))
                            (t default-directory)))
                 (default-directory dir)
-                (eshell-buffer-name (op/eshell-bufname dir)))
+                (eshell-buffer-name (let ((name (op/eshell-bufname dir)))
+                                      (if arg
+                                          (generate-new-buffer name)
+                                        name))))
            (eshell)))
 
        <<op/append-to-buffer>>
