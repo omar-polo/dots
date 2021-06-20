@@ -315,13 +315,19 @@ Here be dragons.
                 :publishing-directory "~/w/blog/resources/dots/"
                 :recursive t
                 :publishing-function org-html-publish-to-html)
+               ("dots-org-gmi"
+                :base-directory "~/dots"
+                :base-extension "org"
+                :publishing-directory "~/w/blog/resources/dots/"
+                :recursive t
+                :publishing-function org-gemini-publish-to-gemini)
                ("dots-static"
                 :base-directory "~/dots"
                 :base-extension "css\\|png\\|jpg\\|jpeg"
                 :publishing-directory "~/w/blog/resources/dots/"
                 :recursive t
                 :publishing-function org-publish-attachment)
-               ("dots" :components ("dots-org" "dots-static"))))
+               ("dots" :components ("dots-org" "dots-org-gmi" "dots-static"))))
 
        (define-key global-map (kbd "C-z p p") #'org-publish)
        (define-key global-map (kbd "C-z p P") #'org-publish-all))
@@ -384,8 +390,8 @@ Here be dragons.
    #+begin_src emacs-lisp
      (let ((font "mononoki 10"))
        (add-to-list 'default-frame-alist `(font . ,font))
-       (set-face-attribute 'default t :font font)
-       (set-face-attribute 'default nil :font font)
+       (set-face-attribute 'default t :font font :height 100)
+       (set-face-attribute 'default nil :font font :height 100)
        (set-frame-font font nil t))
    #+end_src
 ** tab-bar
@@ -479,7 +485,10 @@ Here be dragons.
    especially useful when using the emacs daemon.  Truth to be told,
    I'm thinking of getting rid of this in favour of something like =recentf=.
 
-   #+begin_src emacs-lisp
+   <2021-06-16 Wed> I've disabled =desktop.el= in favour of =recentf=,
+   let's see how it goes!
+
+   #+begin_src emacs-lisp :tangle no
      (use-package desktop
        :straight nil
        :hook ((after-init . desktop-read)
@@ -488,6 +497,22 @@ Here be dragons.
                 (desktop-base-lock-name ".desktop.lock")
                 (desktop-restore-eager 8)
                 (desktop-restore-frames nil)))
+   #+end_src
+** recentf
+   #+begin_src emacs-lisp
+     (require 'recentf)
+     (recentf-mode t)
+
+     (setq recentf-max-saved-items 80)
+
+     (defun op/find-recentf (file)
+       "Use `completing-read' to open a recent FILE."
+       (interactive (list (completing-read "Find recent file: "
+                                           recentf-list)))
+       (when file
+         (find-file file)))
+
+     (define-key global-map (kbd "C-x C-r") #'op/find-recentf)
    #+end_src
 ** Gemini for =thingatpoint=
    I don't exactly remember why, but this should enable the
@@ -1673,6 +1698,15 @@ Here be dragons.
               ("p" . previous-line)
               ("l" . recenter-top-bottom)))
    #+end_src
+** pdf-tools
+   Not really text-related, but still.
+
+   #+begin_src emacs-lisp
+     (use-package pdf-tools)
+   #+end_src
+
+   Works great on OpenBSD.  It would be cool to make a package out of
+   it, but since it requires tablist from melpa it may be a problem?
 ** avy
    I definitely need to use it more.  It allows to quickly jump
    around, both in the same and in other buffers.
@@ -2212,6 +2246,10 @@ Here be dragons.
         :config
         (defun op/gemini-setup ()
           (setq-local cursor-type 'bar)))
+    #+end_src
+
+    #+begin_src emacs-lisp
+      (use-package ox-gemini)
     #+end_src
 
 *** Markdown
