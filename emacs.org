@@ -568,6 +568,12 @@ Here be dragons.
     (setq enable-recursive-minibuffers t)
   #+end_src
 
+  I'm generally pretty lazy, so why pressing shift to get the case
+  right?
+  #+begin_src emacs-lisp
+    (setq completion-ignore-case t)
+  #+end_src
+
   Misc enhancement to the minibuffer behaviour.
   #+begin_src emacs-lisp
     ;; add prompt inidcator to `completing-read-multiple'.
@@ -1192,7 +1198,8 @@ Here be dragons.
        <<c-skeleton>>
        <<go-skeleton>>
        <<clojure-skeleton>>
-       <<perl-skeleton>>)
+       <<perl-skeleton>>
+       <<svg-skeleton>>)
    #+end_src
 
    I prefer the ISC license, and tend to use that for almost all the C
@@ -1298,6 +1305,21 @@ Here be dragons.
          "=head1 SYNOPSIS" "\n\n\n"
          "=head1 DESCRIPTION" "\n\n\n"
          "=cut" "\n"))
+   #+end_src
+
+   I'm also writing some small SVGs in Emacs, and I keep forgetting
+   the right =xmlns=...
+
+   #+NAME: svg-skeleton
+   #+begin_src emacs-lisp :tangle no
+     (define-auto-insert '("\\.svg\\'" . "SVG Skeleton")
+       '("Name: "
+         "<svg xmlns=\"http://www.w3.org/2000/svg\"" \n
+         "    version=\"1.1\"" \n
+         "    width=\"\"" \n
+         "    height=\"\">"
+         "  " _ \n
+         "</svg>"))
    #+end_src
 
 ** DIRED
@@ -1702,11 +1724,19 @@ Here be dragons.
    Not really text-related, but still.
 
    #+begin_src emacs-lisp
-     (use-package pdf-tools)
+     (use-package pdf-tools
+       :bind (:map pdf-view-mode-map
+                   ("C-s" . isearch-forward))
+       :custom (pdf-annot-activate-created-annotations t)
+       :config
+       (pdf-tools-install))
    #+end_src
 
    Works great on OpenBSD.  It would be cool to make a package out of
    it, but since it requires tablist from melpa it may be a problem?
+
+   <2021-06-23 Wed> see [[http://alberto.am/2020-04-11-pdf-tools-as-default-pdf-viewer.html][this post]] to hints on how to integrate it with
+   AucTeX.
 ** avy
    I definitely need to use it more.  It allows to quickly jump
    around, both in the same and in other buffers.
@@ -1760,6 +1790,16 @@ Here be dragons.
                                            "\\>")
                                    beg end)))))))
    #+end_src
+** Compilation
+   =M-x compile RET= (or =recompile=) spawn a buffer with the output
+   of make.  I find useful to have the buffer scrolling automatically
+
+   #+begin_src emacs-lisp
+     (setq compilation-scroll-output t)
+   #+end_src
+
+   Even if, to be completely honest, keeping it at the top means I can
+   =M-g n=/=p= easily...
 ** Languages
 *** jump to matching paren
     The idea behind this is really cool.  Pressing =%= with the cursor
@@ -2048,6 +2088,15 @@ Here be dragons.
     #+begin_src emacs-lisp
       (define-key global-map (kbd "C-z a s") #'psql)
       (define-key global-map (kbd "C-z a S") #'op/psql-params)
+    #+end_src
+*** nxml
+    =nxml-mode= is the major mode for editing XML buffers.  I use it
+    to edit [[svg]] files too.
+
+    #+begin_src emacs-lisp
+      (setq nxml-slash-auto-complete-flag t)
+
+      (add-hook 'nxml-mode-hook #'smartparens-strict-mode)
     #+end_src
 *** web
     =web-mode= provides font-lock, indentation and stuff for various
