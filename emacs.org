@@ -169,9 +169,9 @@ Here be dragons.
              :map org-src-mode-map
                   ("C-x w" . org-edit-src-exit)
                   ("C-x C-s" . org-edit-src-exit))
-      :hook ((org-mode . op/org-setup)
-             (org-mode . variable-pitch-mode))
+      :hook ((org-mode . op/org-setup))
       :custom ((org-todo-keywords '((sequence "TODO" "WAITING" "|" "DONE")
+                                    (sequence "IDEA" "WRITING" "|" "POSTED")
                                     (sequence "REPORT" "BUG" "KNOWCAUSE" "|" "FIXED")
                                     (sequence "|" "CANCELLED")))
                (org-capture-templates '(("n" "annotate something" entry (file "~/org/personal.org")
@@ -385,10 +385,15 @@ Here be dragons.
   #+end_src
 ** Font
    I discovered this font thanks to a submission on the ports@ mailing
-   list.  I'm just trying it for now, I'm not sure if I really like it.
+   list.  I'm just trying it for now, I'm not sure if I really like
+   it.
+
+   <2021-07-29 Thu> I'm trying iosevka again.  Mononoki is cool, but I
+   like fonts that takes as little horizontal space as possible, and
+   iosevka seems tiny, yet readable.
 
    #+begin_src emacs-lisp
-     (let ((font "mononoki 10"))
+     (let ((font "Iosevka Term Curly Medium 9"))
        (add-to-list 'default-frame-alist `(font . ,font))
        (set-face-attribute 'default t :font font :height 100)
        (set-face-attribute 'default nil :font font :height 100)
@@ -746,7 +751,7 @@ Here be dragons.
         (window-sides-vertical nil)
         (switch-to-buffer-in-dedicated-window 'pop)
         (split-height-threshold 160)
-        (split-width-threshold 80)
+        (split-width-threshold 90)
         (split-window-preferred-function #'op/split-window-sensibly))
        :config
        (defun op/split-window-prefer-horizontal (&optional window)
@@ -942,6 +947,14 @@ Here be dragons.
          (interactive)
          (hydra-set-property 'hydra-window :verbosity 0)
          (hydra-window/body)))
+   #+end_src
+** Ace window
+   #+begin_src emacs-lisp
+     (use-package ace-window
+       :bind (("C-z o" . ace-window))
+       :custom ((aw-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s))
+                (aw-dispatch-always t)
+                (aw-minibuffer-flag t)))
    #+end_src
 * Text editing
 ** Misc
@@ -1792,10 +1805,11 @@ Here be dragons.
    #+end_src
 ** Compilation
    =M-x compile RET= (or =recompile=) spawn a buffer with the output
-   of make.  I find useful to have the buffer scrolling automatically
+   of make.  Generally speaking, auto scroll on that is useless, but I
+   keep this bit here in case I'll ever change my mind.
 
    #+begin_src emacs-lisp
-     (setq compilation-scroll-output t)
+     (setq compilation-scroll-output nil)
    #+end_src
 
    Even if, to be completely honest, keeping it at the top means I can
@@ -2091,8 +2105,7 @@ Here be dragons.
     #+end_src
 *** nxml
     =nxml-mode= is the major mode for editing XML buffers.  I use it
-    to edit [[svg]] files too.
-
+    to edit svg files too.
     #+begin_src emacs-lisp
       (setq nxml-slash-auto-complete-flag t)
 
@@ -2290,8 +2303,7 @@ Here be dragons.
 
     #+begin_src emacs-lisp
       (use-package gemini-mode
-        :hook ((gemini-mode . op/gemini-setup)
-               (gemini-mode . variable-pitch-mode))
+        :hook ((gemini-mode . op/gemini-setup))
         :config
         (defun op/gemini-setup ()
           (setq-local cursor-type 'bar)))
@@ -2873,6 +2885,7 @@ Here be dragons.
    Elpher is a Gemini/Gopher browser for Emacs.
    #+begin_src emacs-lisp
      (use-package elpher
+       :load-path "~/w/elpher"
        :custom ((elpher-ipv4-always nil)
                 (elpher-default-url-type "gemini"))
        :commands (elpher elpher-go elpher-jump))
@@ -3258,7 +3271,8 @@ Here be dragons.
        (clear-abbrev-table c-mode-abbrev-table))
 
      (define-abbrev-table 'c-mode-abbrev-table
-       '(("inculde" "include")))
+       '(("inculde" "include")
+         ("inlcude" "include")))
 
      ;; turn on abbrev mode globally
      (setq-default abbrev-mode t)
@@ -3329,7 +3343,14 @@ Here be dragons.
         ;; percentage, line number and narrow
         (:eval (if (my/alt-mode-p)
                    " "
-                 " %p L%l %n "))             ; add C%c for the chars
+                 (concat " %p L%l "
+                         (when (or (eq major-mode 'c-mode)
+                                   (eq major-mode 'autoconf-mode)
+                                   (eq major-mode 'makefile-automake-mode)
+                                   (eq major-mode 'clojure-mode)
+                                   (eq major-mode 'clojurescript-mode))
+                           "C%c ")
+                         "%n")))
 
         ;; show minor modes (eventually)
         (:eval (when my/show-minor-modes
