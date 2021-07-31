@@ -811,7 +811,7 @@ Here be dragons.
                (vmd    "\\*vmd console .*"))
            `((compilation-mode :noselect t
                                :align above
-                               :size 0.3)
+                               :size 0.2)
              ("*Async Shell Command*" :ignore t)
              (,repls :regexp t
                      :align below
@@ -948,6 +948,37 @@ Here be dragons.
          (hydra-set-property 'hydra-window :verbosity 0)
          (hydra-window/body)))
    #+end_src
+** Side windows
+   Side windows are an interesting concept.  Emacs reserve an optional
+   space at the top, bottom, left and right of the frame for these
+   side windows.  You can think of them as a dockable space, akin to
+   the panels in IDEs.
+
+   I'm finding useful to keep an IRC buffer at the bottom of the
+   frame, to avoid jumping from the "code" frame to the "chat" frame
+   or switch buffers continuously.
+
+   The following functions helps achieve this:
+
+   #+begin_src emacs-lisp
+     (defun op/buffer-to-side-window (place)
+       "Place the current buffer in the side window at PLACE."
+       (interactive (list (intern
+                           (completing-read "Which side: "
+                                            '(top left right bottom)))))
+       (let ((buf (current-buffer)))
+         (display-buffer-in-side-window
+          buf `((window-height . 0.15)
+                (side . ,place)
+                (slot . -1)
+                (window-parameters . ((no-delete-other-windows . t)
+                                      (no-other-window t)))))
+         (delete-window)))
+   #+end_src
+
+   See that =no-other-window=? it means that the side window won't be
+   accessible by =other-window= means (i.e. =C-x o=).  Which brings us
+   to Ace Windows.
 ** Ace window
    #+begin_src emacs-lisp
      (use-package ace-window
@@ -2885,7 +2916,6 @@ Here be dragons.
    Elpher is a Gemini/Gopher browser for Emacs.
    #+begin_src emacs-lisp
      (use-package elpher
-       :load-path "~/w/elpher"
        :custom ((elpher-ipv4-always nil)
                 (elpher-default-url-type "gemini"))
        :commands (elpher elpher-go elpher-jump))
