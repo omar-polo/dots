@@ -828,7 +828,7 @@ Here be dragons.
                         :size 0.3)
              (,vcs :regexp t
                    :align above
-                   :size 0.3
+                   :size 0.15
                    :select t)
              (,elfeed :regexp t
                       :align t
