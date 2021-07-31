@@ -1005,6 +1005,31 @@ Here be dragons.
      (define-key global-map (kbd "M-c")   #'capitalize-dwim)
 
    #+end_src
+** Auto-saving
+   I have a problem with compulsive saving.  I type =C-x C-s= every
+   few keystroke to write the buffer I'm editing.
+
+   I'm trying to make emacs do that for me, so make it save early
+   instead of waiting me to press the combination.  Normally emacs
+   uses an =auto-save= file, but if the global minor mode
+   =auto-save-visited-mode= is active, it actually saves the file.
+
+   #+begin_src emacs-lisp
+     (auto-save-visited-mode +1)
+   #+end_src
+
+   This is still not enough.  By default it saves every 5 seconds,
+   which is *obviously* wrong.  Five seconds are like an eternity!
+   I'm auto-saving every two seconds, but I'm tempted to drop to one
+   second.
+
+   #+begin_src emacs-lisp
+     (setq auto-save-visited-interval 2)
+   #+end_src
+
+   I'm only scared of the consequences of this over TRAMP.  I don't
+   use it very often, but I guess that something to disable locally
+   auto-save-visited-mode could be implemented.
 
 ** imenu
    Imenu is a mean of navigation in a buffer.  It can act like a TOC,
