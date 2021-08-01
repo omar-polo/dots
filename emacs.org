@@ -91,8 +91,8 @@ Here be dragons.
   A bit of /clojure-ness/ is always accepted!  I copied the idea of a
   =comment= macro from there.  In elisp there is a =ignore= function,
   but that evaluates its argument, yielding always nil, whereas
-  =comment= doesn't evaluate its body.  It's useful to temporary disable
-  bits of code.
+  =comment= doesn't evaluate its body.  It's useful to temporary
+  disable bits of code.
 
   #+begin_src emacs-lisp
     (defmacro comment (&rest _body)
