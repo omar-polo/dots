@@ -102,8 +102,8 @@ Here be dragons.
 
   One drawbacks of using a /literate/ init file is that customisation
   get lost every time it get tangled, because they're usually appended
-  at the end of the =user-init-file=.  The simplest solution I found is
-  to move the custom stuff in another file, so it gets persisted:
+  at the end of the =user-init-file=.  The simplest solution I found
+  is to move the custom stuff in another file, so it gets persisted:
 
   #+begin_src emacs-lisp
     (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -267,6 +267,7 @@ Here be dragons.
    #+begin_src emacs-lisp :tangle no
      ;; NOTE: needs sqlite3
      (use-package org-roam
+       :init (setq org-roam-v2-ack t) ; yeah, I know I'm on v2
        :custom ((org-roam-directory "~/org-roam")
                 (org-roam-capture-templates
                  (let ((file-name "%<%Y%m%d%H%M%S>-${slug}"))
@@ -278,13 +279,11 @@ Here be dragons.
                      ("l" "link" plain #'org-roam-capture--get-point
                       "%?"
                       :file-name ,file-name
-                      :head "#+title: ${title}\n#+roam_tags: \n#+roam_key: %x\n")))))
-       :hook ((after-init . org-roam-mode))
-       :bind (("C-z r o" . org-roam-capture)
-              ("C-z r u" . org-roam-find-file)
-              ("C-z r e" . org-roam)
-              :map org-roam-mode-map
-              ("C-z r O" . org-roam-insert))
+                      :head "#+title: ${title}\n#+filetags: \n#+roam_key: %x\n")))))
+       :hook ((after-init . org-roam-setup))
+       :bind (("C-z r l" . org-roam-buffer-toggle)
+              ("C-z r f" . org-roam-node-find)
+              ("C-z r i" . org-roam-node-insert))
        :config
        (comment
         (make-directory org-roam-directory)))
@@ -3403,7 +3402,8 @@ Here be dragons.
                                    (eq major-mode 'autoconf-mode)
                                    (eq major-mode 'makefile-automake-mode)
                                    (eq major-mode 'clojure-mode)
-                                   (eq major-mode 'clojurescript-mode))
+                                   (eq major-mode 'clojurescript-mode)
+                                   (eq major-mode 'go-mode))
                            "C%c ")
                          "%n")))
 
