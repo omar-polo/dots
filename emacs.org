@@ -2746,6 +2746,38 @@ Here be dragons.
              (message "after load"))
          (error (message "NOT loading mu4e configuration.  It's missing!"))))
    #+end_src
+*** attach multiple files
+    mu4e uses mml-attach-file which, sadly, doesn't accept multiple
+    files.  Here's an attempt that uses dired to attach multiple file:
+
+    #+begin_src emacs-lisp
+      (defun op/composing-buffers ()
+        "Return a list of composing email buffers."
+        (cl-loop for buf being the buffers
+                 when (with-current-buffer buf
+                        (eq major-mode 'mu4e-compose-mode))
+                 collect buf))
+
+      ;; XXX: broken when multiple mu4e-compose-mode buffers are present!
+      (defun op/mml-attach-multiple-files ()
+        "Attach the file marked from a dired buffer.
+      Uses `mml-attach-file' to attach the single files."
+        (interactive)
+        (let ((files (dired-get-marked-files))
+              (bufs  (op/composing-buffers)))
+          (with-current-buffer (if (cdr bufs) ; if more than one
+                                   (completing-read "Select email: " bufs)
+                                 (car bufs))
+            (dolist (file files)
+              (if (file-regular-p file)
+                  (mml-attach-file file
+                                   (mm-default-file-encoding file)
+                                   nil
+                                   "inline")
+                (message "Skipping non-regular file %s" file))))))
+
+      (define-key dired-mode-map (kbd "C-c C-a") #'op/mml-attach-multiple-files)
+    #+end_src
 ** pass
    I've recently switched to the =pass= password manager.  It stores
    every password in a gpg-encrypted file inside a git repository,
