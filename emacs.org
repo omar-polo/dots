@@ -268,18 +268,7 @@ Here be dragons.
      ;; NOTE: needs sqlite3
      (use-package org-roam
        :init (setq org-roam-v2-ack t) ; yeah, I know I'm on v2
-       :custom ((org-roam-directory "~/org-roam")
-                (org-roam-capture-templates
-                 (let ((file-name "%<%Y%m%d%H%M%S>-${slug}"))
-                   `(("d" "default" plain #'org-roam-capture--get-point
-                      "%?"
-                      :file-name ,file-name
-                      :head "#+title: ${title}\n"
-                      :unnarrowed t)
-                     ("l" "link" plain #'org-roam-capture--get-point
-                      "%?"
-                      :file-name ,file-name
-                      :head "#+title: ${title}\n#+filetags: \n#+roam_key: %x\n")))))
+       :custom ((org-roam-directory "~/org-roam"))
        :hook ((after-init . org-roam-setup))
        :bind (("C-z r l" . org-roam-buffer-toggle)
               ("C-z r f" . org-roam-node-find)
