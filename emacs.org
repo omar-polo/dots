@@ -1847,6 +1847,14 @@ Here be dragons.
                                            "\\>")
                                    beg end)))))))
    #+end_src
+** editorconfig
+   I don't use it very often, so this bit not actually included in the
+   configuration, but when you need it, it's handy:
+
+   #+begin_src emacs-lisp :tangle no
+     (use-package editorconfig
+       :config (editorconfig-mode +1))
+   #+end_src
 ** Compilation
    =M-x compile RET= (or =recompile=) spawn a buffer with the output
    of make.  Generally speaking, auto scroll on that is useless, but I
