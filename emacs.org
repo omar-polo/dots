@@ -3523,7 +3523,7 @@ Here be dragons.
              (hl-background "grey94")
              (hl-face-background nil)
              (failure "red")
-             (org-background "grey98"))
+             (org-background "grey94"))
         (custom-theme-set-faces
          'minimal-light
 
@@ -3629,8 +3629,7 @@ Here be dragons.
          `(org-level-7 ((,class (:foreground ,foreground))))
          `(org-level-8 ((,class (:foreground ,foreground))))
 
-         `(org-block ((,class (:inherit fixed-pitch))))
-         `(org-table   ((,class (:inherit fixed-pitch))))
+         `(org-table ((,class (:inherit fixed-pitch))))
          `(org-meta-line ((,class (:inherit (font-lock-comment-face fixed-pitch)))))
          `(org-property-value ((,class (:inherit fixed-pitch))) t)
          `(org-verbatim ((,class (:inherit (shadow fixed-pitch)))))
