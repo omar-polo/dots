@@ -3428,6 +3428,7 @@ Here be dragons.
                    " "
                  (concat " %p L%l "
                          (when (or (eq major-mode 'c-mode)
+                                   (eq major-mode 'c++-mode)
                                    (eq major-mode 'autoconf-mode)
                                    (eq major-mode 'makefile-automake-mode)
                                    (eq major-mode 'clojure-mode)
