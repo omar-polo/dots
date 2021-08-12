@@ -3,6 +3,8 @@
 #+PROPERTY: header-args :tangle ~/.emacs.d/init.el
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
 
+* Emacs stuff
+
 Here be dragons.
 
 ** early-init.el
@@ -726,6 +728,7 @@ Here be dragons.
        :config
        (corfu-global-mode +1))
    #+end_src
+
 ** Window management
    This is a bit topic for me, and the only thing that I'm not
    completely happy with.  Fortunately, as time goes, I'm less annoyed
@@ -1001,6 +1004,7 @@ Here be dragons.
       (define-key global-map (kbd "M-c")   #'capitalize-dwim)
 
     #+end_src
+
 *** Auto-saving
     I have a problem with compulsive saving.  I type =C-x C-s= every
     few keystroke to write the buffer I'm editing.
@@ -1035,6 +1039,7 @@ Here be dragons.
     #+begin_src emacs-lisp
       (setq imenu-auto-rescan t)
     #+end_src
+
 *** Filling
     This is a useful function copied from somewhere I don't remember,
     sorry unknown author!
@@ -1462,6 +1467,7 @@ Here be dragons.
         :bind ("C-z s" . scratchpads-new-scratchpad)
         :straight nil)
     #+end_src
+
 *** Occur & loccur
     Occur is a grep-like functionality for Emacs.  It populates the
     =*occur*= buffer with the lines matching a certain regexp in the
@@ -1480,6 +1486,7 @@ Here be dragons.
       (use-package loccur
         :bind (("C-c O" . loccur)))
     #+end_src
+
 *** hideshow
     Hideshow is a built-in package to fold section of code.  It has
     some really awkward keybindings under =C-c @=, but otherwise is
@@ -1488,6 +1495,7 @@ Here be dragons.
     #+begin_src emacs-lisp
       (add-hook 'prog-mode-hook #'hs-minor-mode)
     #+end_src
+
 *** Smartparens
     Smartparens has become my go-to package for managing parethesis
     and the like.  The peculiar thing is that, unlike packages such as
@@ -1761,6 +1769,7 @@ Here be dragons.
               try-complete-lisp-symbol-partially
               try-complete-lisp-symbol))
     #+end_src
+
 *** isearch
     Some very small tweaks for isearch
     #+begin_src emacs-lisp
@@ -1768,11 +1777,13 @@ Here be dragons.
             search-whitespace-regexp ".*?"
             isearch-allow-scroll 'unlimited)
     #+end_src
+
 *** etags
     Reload tags without asking
     #+begin_src emacs-lisp
       (setq tags-revert-without-query 1)
     #+end_src
+
 *** view mode
     Sometimes it's handy to make a buffer read-only.  Also, define
     some key to easily navigate in read-only buffers.
@@ -2602,18 +2613,21 @@ Here be dragons.
         (define-key op/vterm-map (kbd "v") #'vterm)
         (define-key op/vterm-map (kbd "v") #'op/project-vterm))
     #+end_src
+
 *** ibuffer
     Ibuffer is a package to list, filter and do stuff on the buffers.
 
     #+begin_src emacs-lisp
       (define-key global-map (kbd "C-x C-b") #'ibuffer)
     #+end_src
+
 *** help
     Help buffers are, no pun intended, helpful.  But they are so more
     with a bit o' visual lines:
     #+begin_src emacs-lisp
       (add-hook 'help-mode-hook #'visual-line-mode)
     #+end_src
+
 *** gdb
     I like the "many buffer" view of gdb, so let's enable it
     #+begin_src emacs-lisp
@@ -2624,6 +2638,7 @@ Here be dragons.
     #+begin_src emacs-lisp
       (defalias 'egdb #'gdb)
     #+end_src
+
 *** Literate calc-mode
     This is pretty awesome.  It provides a major mode where we can
     type expression and do math inline.  Truly awesome.
@@ -2631,6 +2646,7 @@ Here be dragons.
     #+begin_src emacs-lisp
       (use-package literate-calc-mode)
     #+end_src
+
 *** keycast
     Sometimes is nice.  It adds the key and the command in the
     modeline, useful during records.
@@ -2639,6 +2655,7 @@ Here be dragons.
       (use-package keycast
         :custom (keycast-insert-after 'mode-line-misc-info))
     #+end_src
+
 *** email
     *NB*: =mu4e= is installed from ports, not via straight.
     #+begin_src sh :tangle no
@@ -2806,6 +2823,7 @@ Here be dragons.
       (use-package pass
         :bind (("C-z P" . pass)))
     #+end_src
+
 *** vmd
     I wrote a [[https://github.com/omar-polo/vmd.el/][small package]] to interact with =vmd(8)= on OpenBSD.
     It's kinda nice, if I may say so.
@@ -2822,6 +2840,7 @@ Here be dragons.
                 (vterm-buffer-name (concat "*" name "*")))
             (vterm))))
     #+end_src
+
 *** sndio
     I wrote also a package to interact with =sndio(8)=.  Yep, I like
     these small package.
@@ -2832,6 +2851,7 @@ Here be dragons.
         :load-path "~/.emacs.d/lisp/sndio.el/"
         :bind ("C-z a a" . sndio))
     #+end_src
+
 *** EMMS
     Emacs Multi Media System is cool.  It only needs a decent UI,
     which I provide via hydra.
@@ -2969,6 +2989,7 @@ Here be dragons.
 
           ("q" nil :exit t)))
     #+end_src
+
 *** eww
     The infamous Emacs Web Wrowser.  Nothing fancy, just don't store
     cookie please!
@@ -2979,6 +3000,7 @@ Here be dragons.
         :custom ((url-cookie-trusted-urls nil)
                  (url-cookie-untrusted-urls '(".*"))))
     #+end_src
+
 *** elpher
     Elpher is a Gemini/Gopher browser for Emacs.
     #+begin_src emacs-lisp
@@ -2987,6 +3009,7 @@ Here be dragons.
                  (elpher-default-url-type "gemini"))
         :commands (elpher elpher-go elpher-jump))
     #+end_src
+
 *** pq
     =pq= is a postgres library module for elisp.  Sound crazy, hu?
 
@@ -2995,6 +3018,7 @@ Here be dragons.
         :straight nil
         :load-path "/home/op/build/emacs-libpq/")
     #+end_src
+
 *** nov.el
     =nov= is a package to read epub from Emacs.  It's really cool, and
     integrates with both bookmarks and org-mode.
@@ -3010,6 +3034,7 @@ Here be dragons.
           (olivetti-mode +1)
           (setq-local cursor-type 'bar)))
     #+end_src
+
 *** Toxe
     Toxe is my try at writing a tox client in elisp.  One day will be
     functional, I promise!
@@ -3019,6 +3044,7 @@ Here be dragons.
         :straight nil
         :load-path "~/w/toxe/")
     #+end_src
+
 *** rcirc
     rcirc is the first (and only) Emacs IRC client I tried, and the
     only IRC client I use.  I really like it out-of-the-box!
@@ -3066,6 +3092,7 @@ Here be dragons.
             (load "my-rcirc-conf")
           (error (message "Missing rcirc configuration!"))))
     #+end_src
+
 *** telega
     Telega is *the best* telegram client.  period.
 
@@ -3109,6 +3136,7 @@ Here be dragons.
         ;; for telega-url-shorten
         (use-package all-the-icons))
     #+end_src
+
 *** elfeed
     Elfeed is a RSS reader for Emacs that rocks!
 
@@ -3184,6 +3212,7 @@ Here be dragons.
         :custom (edit-server-new-frame-alist '((name . "Edit with Emacs")
                                                (minibuffer . t))))
     #+end_src
+
 ** "smol" packages
    These are stuff that I keep in =emacs-user-directory/lisp=, but
    that isn't useful enough to submit a package for it.
@@ -3318,6 +3347,7 @@ Here be dragons.
       (provide 'clbin)
       ;;; clbin.el ends here
     #+end_src
+
 *** my-abbrev
 
     Where I store the abbreviation I need.
@@ -3380,6 +3410,7 @@ Here be dragons.
       (provide 'my-abbrev)
       ;;; my-abbrev.el ends here
     #+end_src
+
 *** my-modeline
 
     This is my customized modeline.  It hides informations that I
@@ -3465,6 +3496,7 @@ Here be dragons.
       (provide 'my-modeline)
       ;;; my-modeline.el ends here
     #+end_src
+
 *** minimal-light-theme
 
     =minimal-light-theme= is my personal fork of [[https://github.com/anler/minimal-theme][anler/minimal-theme]].
@@ -3699,6 +3731,7 @@ Here be dragons.
       ;;; minimal-light-theme.el ends here
 
     #+end_src
+
 *** emms-volume-sndioctl
 
     It's a EMMS volume backend for =sndioctl(1)=.  I should probably
@@ -3724,6 +3757,7 @@ Here be dragons.
 
       (provide 'emms-volume-sndioctl)
     #+end_src
+
 *** even-more-cua
 
     Even more cua is something I wrote for someone who wanted to try
