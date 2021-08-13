@@ -164,76 +164,77 @@ Here be dragons.
    day.
 
    #+begin_src emacs-lisp :noweb no-export
-     (use-package org
-       :straight nil
-       :bind (("C-c c" . org-capture)
-              ("C-c a" . org-agenda)
-              ("<f7> s" . org-store-link)
-              :map org-src-mode-map
-              ("C-x w" . org-edit-src-exit)
-              ("C-x C-s" . org-edit-src-exit))
-       :hook ((org-mode . op/org-setup))
-       :custom ((org-todo-keywords '((sequence "TODO" "WAITING" "|" "DONE")
-                                     (sequence "IDEA" "WRITING" "|" "POSTED")
-                                     (sequence "REPORT" "BUG" "KNOWCAUSE" "|" "FIXED")
-                                     (sequence "|" "CANCELLED")))
-                (org-capture-templates '(("n" "annotate something" entry (file "~/org/personal.org")
-                                          "* %? :note:\n  %a")
-                                         ("t" "something to do" entry (file "~/org/personal.org")
-                                          "* TODO %?\n %a")
-                                         ("b" "bug" entry (file "~/org/personal.org")
-                                          "* REPORT %?\n  %a")))
-                (org-ellipsis " [+]")
-                (org-imenu-depth 4)
-                (org-startup-folded t)
-                (org-startup-with-inline-images t)
-                (org-fontify-quote-and-verse-blocks t)
-                (org-use-speed-commands t)
-                (org-src-window-setup 'current-window)
-                (org-directory "~/org")
-                (org-agenda-files '("~/org"))
-                (org-refile-use-outline-path t)
-                (org-outline-path-complete-in-steps nil)
-                (org-refile-targets '((nil :maxlevel . 3)
-                                      (org-agenda-files :maxlevel . 3)))
-                (org-src-fontify-natively t)
-                (org-clock-out-remove-zero-time-clocks t)
-                (org-clock-out-when-done t)
-                (org-clock-auto-clock-resolution '(when-no-clock-is-running))
-                (org-clock-report-include-clocking-task t)
-                (org-time-stamp-rounding-minutes '(1 1))
-                (org-clock-history-length 23)
-                (org-clock-in-resume t)
-                (org-confirm-babel-evaluate nil))
-       :config
-       (require 'org-protocol)
+          (use-package org
+            :straight nil
+            :bind (("C-c c" . org-capture)
+                   ("C-c a" . org-agenda)
+                   ("<f7> s" . org-store-link)
+                   :map org-src-mode-map
+                   ("C-x w" . org-edit-src-exit)
+                   ("C-x C-s" . org-edit-src-exit))
+            :hook ((org-mode . op/org-setup))
+            :custom ((org-todo-keywords '((sequence "TODO" "WAITING" "|" "DONE")
+                                          (sequence "IDEA" "WRITING" "|" "POSTED")
+                                          (sequence "REPORT" "BUG" "KNOWCAUSE" "|" "FIXED")
+                                          (sequence "|" "CANCELLED")))
+                     (org-capture-templates '(("n" "annotate something" entry (file "~/org/personal.org")
+                                               "* %? :note:\n  %a")
+                                              ("t" "something to do" entry (file "~/org/personal.org")
+                                               "* TODO %?\n %a")
+                                              ("b" "bug" entry (file "~/org/personal.org")
+                                               "* REPORT %?\n  %a")))
+                     (org-ellipsis " [+]")
+                     (org-imenu-depth 4)
+                     (org-startup-folded t)
+                     (org-startup-with-inline-images t)
+                     (org-fontify-quote-and-verse-blocks t)
+                     (org-use-speed-commands t)
+                     (org-src-window-setup 'current-window)
+                     (org-directory "~/org")
+                     (org-agenda-files '("~/org"))
+                     (org-refile-use-outline-path t)
+                     (org-outline-path-complete-in-steps nil)
+                     (org-refile-targets '((nil :maxlevel . 3)
+                                           (org-agenda-files :maxlevel . 3)))
+                     (org-src-fontify-natively t)
+                     (org-clock-out-remove-zero-time-clocks t)
+                     (org-clock-out-when-done t)
+                     (org-clock-auto-clock-resolution '(when-no-clock-is-running))
+                     (org-clock-report-include-clocking-task t)
+                     (org-time-stamp-rounding-minutes '(1 1))
+                     (org-clock-history-length 23)
+                     (org-clock-in-resume t)
+                     (org-confirm-babel-evaluate nil))
+            :config
+            (require 'org-protocol)
 
-       (defun op/org-setup ()
-         (hl-line-mode +1)
-         (auto-fill-mode +1)
-         (whitespace-mode -1)
-         (setq-local cursor-type 'bar)
-         (setq-local delete-trailing-lines t)
-         (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))
+            (defun op/org-setup ()
+              (hl-line-mode +1)
+              (auto-fill-mode +1)
+              (whitespace-mode -1)
+              (setq-local cursor-type 'bar)
+              (setq-local delete-trailing-lines t)
+              (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))
 
-       (org-link-set-parameters "gemini"
-                                :follow (lambda (p) (elpher-go (concat "gemini:" p)))
-                                :display 'full)
+            (org-link-set-parameters "gemini"
+                                     :follow (lambda (p) (elpher-go (concat "gemini:" p)))
+                                     :display 'full)
 
-       (org-babel-do-load-languages
-        'org-babel-load-languages
-        '((emacs-lisp . t)
-          (C . t)
-          (R . t)
-          (sql . t)
-          (lisp . t)
-          (shell . t)
-          (sqlite . t)
-          (python . t)
-          (gnuplot . t)))
-       (setq org-babel-lisp-eval-fn #'sly-eval)
+            (org-babel-do-load-languages
+             'org-babel-load-languages
+             '((emacs-lisp . t)
+               (C . t)
+               (R . t)
+               (sql . t)
+               (lisp . t)
+               (shell . t)
+               (sqlite . t)
+               (python . t)
+               (gnuplot . t)))
+            (setq org-babel-lisp-eval-fn #'sly-eval)
 
-       <<org-roam>>)
+            <<org-roam>>
+            <<org-tree-slide>>)
    #+end_src
 
    I'm having some problems with org, in particular =C-c C-e ...=
@@ -279,6 +280,15 @@ Here be dragons.
         :config
         (comment
          (make-directory org-roam-directory)))
+    #+end_src
+
+
+*** Presentations in org-mode
+
+    #+NAME: org-tree-slide
+    #+begin_src emacs-lisp :tangle no
+            (use-package org-tree-slide
+              :custom ((org-image-actual-width nil)))
     #+end_src
 
 *** Org publish
@@ -375,6 +385,16 @@ Here be dragons.
 
      (define-key global-map (kbd "C-!") #'op/digit-argument-zero)
    #+end_src
+
+   I always end up trying to execute =unload-theme= instead of
+   =disable-theme= when I want to get rid of a theme.  If to load a
+   theme I have to =M-x load-theme=, why the dual operation is
+   =disable-theme=?  Who knows, but I'll keep the alias.
+
+   #+begin_src emacs-lisp
+     (defalias 'unload-theme #'disable-theme)
+   #+end_src
+
 *** Font
     I discovered this font thanks to a submission on the ports@
     mailing list.  I'm just trying it for now, I'm not sure if I
@@ -1736,7 +1756,6 @@ Here be dragons.
     #+begin_src emacs-lisp
       (use-package olivetti
         :hook ((gemini-mode . olivetti-mode)
-               (org-mode . olivetti-mode)
                (markdown-mode . olivetti-mode)))
     #+end_src
 
@@ -2445,7 +2464,8 @@ Here be dragons.
                   "\\`\\(\\.\\.?\\|CVS\\|\\.svn\\|\\.git\\|\\.got\\)/\\'")
                  (eshell-save-history-on-exit t)
                  (eshell-prompt-regexp "[#$] ")
-                 (eshell-prompt-function (lambda () "$ ")))
+                 (eshell-prompt-function (lambda () "$ "))
+                 (eshell-history-size 1024))
         :config
         <<eshell/aliases>>
 
@@ -2555,6 +2575,22 @@ Here be dragons.
             (narrow-to-region start end))))
     #+end_src
 
+    Eshell unfortunately doesn't uses from =comint=, so it lacks some
+    niceties that were added to it.  One of these things is the
+    minibuffer completion for history navigation.  I like to select an
+    history item using the minibuffer:
+
+    #+begin_src emacs-lisp
+      (defun op/eshell-select-from-history ()
+        (interactive)
+        (let ((item (completing-read "Select from history: "
+                                     (seq-uniq (ring-elements eshell-history-ring)))))
+          (when item
+            ;; from eshell-previous-matching-input
+            (delete-region eshell-last-output-end (point))
+            (insert-and-inherit item))))
+    #+end_src
+
     The weirdest thing about eshell is how it manages its own keys.
     =eshell-mode-map=, unlike other =*-mode-map= variables, is
     buffer-local, so a
@@ -2571,7 +2607,9 @@ Here be dragons.
     #+begin_src emacs-lisp :tangle no
       (defun op/setup-eshell ()
         (define-key eshell-mode-map (kbd "C-c C-B") #'op/append-to-buffer)
-        (define-key eshell-mode-map (kbd "C-c M-l") #'op/eshell-narrow-to-output))
+        (define-key eshell-mode-map (kbd "C-c M-l") #'op/eshell-narrow-to-output)
+        (message "before binding M-r")
+        (define-key eshell-mode-map (kbd "M-r") #'op/eshell-select-from-history))
     #+end_src
 
 **** TODO make =>>>= ignore =stderr=
