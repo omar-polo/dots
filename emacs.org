@@ -1824,7 +1824,7 @@ Here be dragons.
         :bind (:map pdf-view-mode-map
                     ("C-s" . isearch-forward))
         :custom (pdf-annot-activate-created-annotations t)
-        :config
+        :init
         (pdf-tools-install))
     #+end_src
 
