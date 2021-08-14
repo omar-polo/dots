@@ -287,8 +287,8 @@ Here be dragons.
 
     #+NAME: org-tree-slide
     #+begin_src emacs-lisp :tangle no
-            (use-package org-tree-slide
-              :custom ((org-image-actual-width nil)))
+      (use-package org-tree-slide
+        :custom ((org-image-actual-width nil)))
     #+end_src
 
 *** Org publish
