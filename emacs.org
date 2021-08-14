@@ -3699,6 +3699,8 @@ Here be dragons.
          `(org-level-7 ((,class (:foreground ,foreground))))
          `(org-level-8 ((,class (:foreground ,foreground))))
 
+         `(org-ellipsis ((,class (:inherit org-ellipsis :underline nil))))
+
          `(org-table ((,class (:inherit fixed-pitch))))
          `(org-meta-line ((,class (:inherit (font-lock-comment-face fixed-pitch)))))
          `(org-property-value ((,class (:inherit fixed-pitch))) t)
