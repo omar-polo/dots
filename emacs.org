@@ -2626,7 +2626,8 @@ Here be dragons.
                     :map vterm-copy-mode-map
                     ("C-c M-t" . vterm-copy-mode))
         :bind-keymap ("C-z v" . op/vterm-map)
-        :custom ((vterm-buffer-name-string "*vterm %s*"))
+        :custom ((vterm-buffer-name-string "*vterm %s*")
+                 (vterm-shell (concat shell-file-name " -l")))
         :config
         (defun op/vterm-fix-c-backspace ()
           (interactive)
