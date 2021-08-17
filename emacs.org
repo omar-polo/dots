@@ -288,7 +288,37 @@ Here be dragons.
     #+NAME: org-tree-slide
     #+begin_src emacs-lisp :tangle no
       (use-package org-tree-slide
-        :custom ((org-image-actual-width nil)))
+        :custom ((org-image-actual-width nil))
+        :config
+        (defun op/org-present-frame ()
+          (let ((frame (make-frame `( ;(minibuffer . nil)
+                                     (title . "Presentation")
+                                     (menu-bar-lines . 0)
+                                     (tool-bar-lines . 0)
+                                     (vertical-scroll-bars . nil)
+                                     (left-fringe . 0)
+                                     (right-fringe . 0)
+                                     (internal-border-width . 10)
+                                     ;(cursor-type . nil)
+                                     ))))
+            (select-frame-set-input-focus frame)
+            (toggle-frame-fullscreen)
+            (raise-frame frame)
+            frame))
+
+        (defun op/org-present ()
+          (interactive)
+          (let ((name "*presentazione*"))
+            (ignore-errors
+              (kill-buffer name))
+            ;; (with-current-buffer (make-indirect-buffer (current-buffer)
+            ;;                                            name))
+            (op/org-present-frame)
+            (org-display-inline-images)
+            (olivetti-mode)
+            (olivetti-set-width 90)
+            (call-interactively #'org-tree-slide-mode)
+            (text-scale-adjust 3))))
     #+end_src
 
 *** Org publish
