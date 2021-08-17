@@ -2109,6 +2109,7 @@ Here be dragons.
            :bind (:map sly-mrepl-mode-map
                        ("M-r" . comint-history-isearch-backward))))
      #+end_src
+
 **** Clojure
      Load =clojure-mode= from MELPA (I guess, or is it ELPA?)
 
@@ -3554,13 +3555,7 @@ Here be dragons.
          (:eval (if (my/alt-mode-p)
                     " "
                   (concat " %p L%l "
-                          (when (or (eq major-mode 'c-mode)
-                                    (eq major-mode 'c++-mode)
-                                    (eq major-mode 'autoconf-mode)
-                                    (eq major-mode 'makefile-automake-mode)
-                                    (eq major-mode 'clojure-mode)
-                                    (eq major-mode 'clojurescript-mode)
-                                    (eq major-mode 'go-mode))
+                          (when column-number-mode
                             "C%c ")
                           "%n")))
 
