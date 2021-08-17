@@ -2089,8 +2089,7 @@ Here be dragons.
        (use-package sly
          :hook ((lisp-mode . prettify-symbols-mode)
                 (lisp-mode . op/disable-tabs)
-                ;; (lisp-mode . sly-symbol-completion-mode)
-                )
+                (lisp-mode . sly-symbol-completion-mode))
          :custom (inferior-lisp-program "sbcl")
          :bind (:map sly-mode-map
                      ("C-c C-z" . op/sly-mrepl))
