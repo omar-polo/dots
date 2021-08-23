@@ -2789,7 +2789,13 @@ Here be dragons.
                   (mu4e-compose-context-policy 'always-ask)
                   (message-kill-buffer-on-exit t)
                   (mu4e-view-show-images t)
-                  (mu4e-use-fancy-chars t)
+
+                  ;; prefer the old style
+                  (mu4e-headers-thread-child-prefix '("├>" . "┣▶ "))
+                  (mu4e-headers-thread-last-child-prefix '("└>" . "┗▶ "))
+                  (mu4e-headers-thread-connection-prefix '("│" . "┃ "))
+                  (mu4e-headers-thread-orphan-prefix '("┬>" . "┳▶ "))
+                  (mu4e-headers-thread-single-orphan-prefix '("─>" . "━▶ "))
 
                   (mu4e~view-beginning-of-url-regexp
                    "https?\\://\\|mailto:\\|gemini://")
