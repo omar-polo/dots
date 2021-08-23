@@ -2023,9 +2023,11 @@ Here be dragons.
        (defun op/dup-line ()
          "Duplicate the current line, using `copy-from-above-command'."
          (interactive)
-         (forward-line 1)
-         (open-line 1)
-         (copy-from-above-command))
+         (save-excursion
+           (forward-line 1)
+           (open-line 1)
+           (copy-from-above-command))
+         (call-interactively #'next-line))
        (define-key prog-mode-map [down] #'op/dup-line)
      #+end_src
 
