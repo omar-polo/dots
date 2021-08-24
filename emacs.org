@@ -2813,6 +2813,11 @@ Here be dragons.
 
          (require 'mu4e)
 
+         ;; fix the keys for the view buffer
+         (define-key mu4e-view-mode-map (kbd "RET") #'push-button)
+         (define-key mu4e-view-mode-map (kbd "SPC") #'scroll-up-command)
+         (define-key mu4e-view-mode-map (kbd "S-SPC") #'scroll-down-command)
+
          (add-to-list 'mu4e-view-actions
                       '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
