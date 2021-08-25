@@ -2,6 +2,8 @@
 #+TITLE: My Emacs configuration
 #+PROPERTY: header-args :tangle ~/.emacs.d/init.el
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
+#+OPTIONS: H:6
+#+TOC: headlines 6
 
 * Emacs stuff
 
@@ -2398,8 +2400,6 @@ Here be dragons.
 
      - I keep the =sys/= includes in a separate block, it'd be nice if
        this would respect that
-     - Most of the time, the first include is for =compat.h=, it'd be
-       nice if this skipped it
      - If there aren't includes in the file this raises an error.
        It'd be nice if it was able to automatically add one after the
        copyright stuff at the start of the buffer.
@@ -2413,9 +2413,11 @@ Here be dragons.
            (let ((re (if localp
                          "^#[ \t]*include[ \t]*\""
                        "^#[ \t]*include[ \t]*<"))
+                 (ignore-re "^#include \"compat.h\"")
                  start)
              (goto-char (point-min))
-             (while (not (or (looking-at re)
+             (while (not (or (and (looking-at re)
+                                  (not (looking-at ignore-re)))
                              (eobp)))
                (forward-line))
              (when (eobp)
@@ -2424,14 +2426,16 @@ Here be dragons.
              (insert "#include " (if localp "\"\"" "<>"))
              (backward-char)
              (insert path)
-             (forward-line -1)
+             (move-beginning-of-line 1)
              (setq start (point))
-             (while (or (not (looking-at re))
-                        (eobp))
+             (forward-line)
+             (while (and (looking-at re)
+                         (not (eobp)))
                (forward-line))
              (sort-lines nil start (point)))))
 
-       (define-key c-mode-map (kbd "C-c C-a") #'op/c-add-include)
+       (with-eval-after-load 'cc-mode
+         (define-key c-mode-map (kbd "C-c C-a") #'op/c-add-include))
      #+end_src
 
 **** Go
