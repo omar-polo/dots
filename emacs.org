@@ -2776,33 +2776,28 @@ Here be dragons.
                   (mu4e-maildir (expand-file-name "~/Maildir"))
                   (mu4e-get-mail-command "mbsync -a")
                   (mu4e-update-interval 180)
-                  (mu4e-headers-auto-update t)
                   (mu4e-compose-signature-auto-include nil)
                   (mu4e-compose-format-flowed nil)
                   (mu4e-compose-in-new-frame t)
                   (mu4e-change-filenames-when-moving t) ;; don't break mbsync!
                   (mu4e-attachment-dir "~/Downloads")
                   (mu4e-compose-dont-reply-to-self t)
-                  (mu4e-view-show-addresses t)
                   (mu4e-confirm-quit nil)
                   (mu4e-context-policy 'pick-first)
                   (mu4e-compose-context-policy 'always-ask)
                   (message-kill-buffer-on-exit t)
-                  (mu4e-view-show-images t)
 
                   (mu4e~view-beginning-of-url-regexp
                    "https?\\://\\|mailto:\\|gemini://")
 
-                  ;; use the ``tech preview''.  mu4e uses gnus article-mode to
-                  ;; show the messages.
-                  (mu4e-view-use-gnus t)
-
                   ;; use localhost to send mails
-                  (message-send-mail-function 'smtpmail-send-it)
+                  (message-send-mail-function #'smtpmail-send-it)
                   (smtpmail-smtp-server "localhost")
                   (smtpmail-default-smtp-server "localhost"))
          :hook (mu4e-view-mode . visual-line-mode)
          :config
+
+         (require 'mu4e)
 
          ;; prefer the old style
          (setq mu4e-headers-thread-child-prefix '("├>" . "┣▶ ")
@@ -2810,8 +2805,6 @@ Here be dragons.
                mu4e-headers-thread-connection-prefix '("│" . "┃ ")
                mu4e-headers-thread-orphan-prefix '("┬>" . "┳▶ ")
                mu4e-headers-thread-single-orphan-prefix '("─>" . "━▶ "))
-
-         (require 'mu4e)
 
          ;; fix the keys for the view buffer
          (define-key mu4e-view-mode-map (kbd "RET") #'push-button)
@@ -2838,58 +2831,59 @@ Here be dragons.
            (interactive)
            (set-fill-column 72)
            (auto-fill-mode)
-           (flyspell-mode)))
-       (add-hook 'mu4e-compose-mode-hook #'op/mu4e-do-compose-stuff)
+           (flyspell-mode))
 
-       (defun op/mu4e-make-bookmarks (mdir)
-         (list (make-mu4e-bookmark :name "Global Unread Messages"
-                                   :query "flag:unread and not flag:trashed"
-                                   :key ?u)
-               (make-mu4e-bookmark :name "Local Unread Messages"
-                                   :query (concat "maildir:" mdir "/* and flag:unread and not flag:trashed")
-                                   :key ?l)
-               (make-mu4e-bookmark :name "Today's Messages"
-                                   :query (concat "maildir:" mdir "/* and date:today..now")
-                                   :key ?t)
-               (make-mu4e-bookmark :name "Big Messages"
-                                   :query (concat "maildir:" mdir "/* and size:1M..500")
-                                   :key ?b)
-               (make-mu4e-bookmark :name "Sent"
-                                   :query (concat "maildir:" mdir "/Sent")
-                                   :key ?s)
-               (make-mu4e-bookmark :name "Drafts"
-                                   :query (concat "maildir:" mdir "/Drafts")
-                                   :key ?d)))
+         (add-hook 'mu4e-compose-mode-hook #'op/mu4e-do-compose-stuff)
 
-       (defun op/mu4e-match-fn (mdir)
-         (lambda (msg)
-           (when msg
-             (string-prefix-p mdir (mu4e-message-field msg :maildir)))))
+         (defun op/mu4e-make-bookmarks (mdir)
+           (list (make-mu4e-bookmark :name "Global Unread Messages"
+                                     :query "flag:unread and not flag:trashed"
+                                     :key ?u)
+                 (make-mu4e-bookmark :name "Local Unread Messages"
+                                     :query (concat "maildir:" mdir "/* and flag:unread and not flag:trashed")
+                                     :key ?l)
+                 (make-mu4e-bookmark :name "Today's Messages"
+                                     :query (concat "maildir:" mdir "/* and date:today..now")
+                                     :key ?t)
+                 (make-mu4e-bookmark :name "Big Messages"
+                                     :query (concat "maildir:" mdir "/* and size:1M..500")
+                                     :key ?b)
+                 (make-mu4e-bookmark :name "Sent"
+                                     :query (concat "maildir:" mdir "/Sent")
+                                     :key ?s)
+                 (make-mu4e-bookmark :name "Drafts"
+                                     :query (concat "maildir:" mdir "/Drafts")
+                                     :key ?d)))
 
-       ;; loading the mu4e configuration without halting emacs if its not found
-       ;;
-       ;; the my-mu4e-config.el file contains:
-       ;;   (setq mu4e-contexts
-       ;;         (list
-       ;;          (make-mu4e-context
-       ;;           :name "foobar"
-       ;;           :match-func (my/mu4e-match-fn "/maildir-name")
-       ;;           :vars `((user-mail.address . "")
-       ;;                   (user-full-name . "")
-       ;;                   (mu4e-sent-folder . "")
-       ;;                   (mu4e-drafts-folder . "")
-       ;;                   (mu4e-trash-folder . "")
-       ;;                   (mu4e-compose-format-flowed . t)
-       ;;                   (mu4e-maildir-shortcuts . (("/foo/bar" . ?f)
-       ;;                                              ...))
-       ;;                   (mu4e-bookmarks . ,(my/mu4e-make-bookmars "/maildir-name"))))))
-       ;;
-       (condition-case nil
-           (progn
-             (message "before load")
-             (load "my-mu4e-config")
-             (message "after load"))
-         (error (message "NOT loading mu4e configuration.  It's missing!")))
+         (defun op/mu4e-match-fn (mdir)
+           (lambda (msg)
+             (when msg
+               (string-prefix-p mdir (mu4e-message-field msg :maildir)))))
+
+         ;; loading the mu4e configuration without halting emacs if its not found
+         ;;
+         ;; the my-mu4e-config.el file contains:
+         ;;   (setq mu4e-contexts
+         ;;         (list
+         ;;          (make-mu4e-context
+         ;;           :name "foobar"
+         ;;           :match-func (my/mu4e-match-fn "/maildir-name")
+         ;;           :vars `((user-mail.address . "")
+         ;;                   (user-full-name . "")
+         ;;                   (mu4e-sent-folder . "")
+         ;;                   (mu4e-drafts-folder . "")
+         ;;                   (mu4e-trash-folder . "")
+         ;;                   (mu4e-compose-format-flowed . t)
+         ;;                   (mu4e-maildir-shortcuts . (("/foo/bar" . ?f)
+         ;;                                              ...))
+         ;;                   (mu4e-bookmarks . ,(my/mu4e-make-bookmars "/maildir-name"))))))
+         ;;
+         (condition-case nil
+             (progn
+               (message "before load")
+               (load "my-mu4e-config")
+               (message "after load"))
+           (error (message "NOT loading mu4e configuration.  It's missing!"))))
      #+end_src
 
 **** attach multiple files
