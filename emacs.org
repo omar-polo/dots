@@ -2381,6 +2381,59 @@ Here be dragons.
                 (c-mode   . irony-mode)
                 (obj-mode . irony-mode)))
      #+end_src
+
+     Being able to interactively teach things to emacs is really
+     cool.  Sometimes I need to add a header at the top of the
+     buffer.  It's not something difficult, I push the point in the
+     mark ring, then jump to the start of the buffer and scroll until
+     I find the block of includes, add the one I want, sort them and
+     pop the mark to continue where I was.  But we can do better:
+     =op/c-add-include= is the answer.  It prompts for a header
+     (without completion for the time being) and it inserts it in the
+     right place.  With the prefix argument it's possible to require
+     the inclusion of a local header.
+
+     There's some space for improvements, but for the time being I'm
+     happy.  Things that I'd like to add in the future:
+
+     - I keep the =sys/= includes in a separate block, it'd be nice if
+       this would respect that
+     - Most of the time, the first include is for =compat.h=, it'd be
+       nice if this skipped it
+     - If there aren't includes in the file this raises an error.
+       It'd be nice if it was able to automatically add one after the
+       copyright stuff at the start of the buffer.
+
+     #+begin_src emacs-lisp
+       (defun op/c-add-include (path &optional localp)
+         "Include PATH at the start of the file.
+       If LOCALP is non-nil, the include will be \"local\"."
+         (interactive "Mheader to include: \nP")
+         (save-excursion
+           (let ((re (if localp
+                         "^#[ \t]*include[ \t]*\""
+                       "^#[ \t]*include[ \t]*<"))
+                 start)
+             (goto-char (point-min))
+             (while (not (or (looking-at re)
+                             (eobp)))
+               (forward-line))
+             (when (eobp)
+               (error "Don't know where to insert the header"))
+             (open-line 1)
+             (insert "#include " (if localp "\"\"" "<>"))
+             (backward-char)
+             (insert path)
+             (forward-line -1)
+             (setq start (point))
+             (while (or (not (looking-at re))
+                        (eobp))
+               (forward-line))
+             (sort-lines nil start (point)))))
+
+       (define-key c-mode-map (kbd "C-c C-a") #'op/c-add-include)
+     #+end_src
+
 **** Go
      My go configuration is simple: just load =go-mode=!
      #+begin_src emacs-lisp
