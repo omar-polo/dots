@@ -261,6 +261,20 @@
     PS1='% '
   #+end_src
 
+** Gemini client
+  I got tired of trying to remember the set of flags for =nc= to talk
+  to Gemini serves, so here we are
+
+  #+begin_src sh
+    # gemini host [port]
+    #	"post" stdin to the given gemini server
+    gemini() {
+	    host=${1:?missing host}
+	    port=${2:-1965}
+	    nc -c -Tnoverify "${host}" "${port}"
+    }
+  #+end_src
+
 ** vterm integration
 
    =vterm= can recognize special escape sequence to pass information
@@ -912,6 +926,9 @@
    want, not some coincidences decided by the order in which the
    package were installed.
 
+   <2021-06-20 Sun> I've installed =pdf-tools=, so there isn't any
+   need for zathura.
+
    #+begin_src sh :tangle ~/bin/xdg-open :tangle-mode (identity #o755)
      #!/bin/sh
 
@@ -920,7 +937,6 @@
 	     ,*jpg|*jpeg)	exec gpicview "$@" ;;
 	     ,*mp4|*mkv)	exec mpv "$@" ;;
 	     ,*m4a)		exec mpv --force-window --lavfi-complex='[aid1] asplit [ao] [v] ; [v] showwaves=mode=line:split_channels=1 [vo]' "$@" ;;
-	     ,*pdf)		exec zathura "$@" ;;
 	     ,*svg)		exec inkscape "$@" ;;
 	     ,*core)		;; # do nothing
 	     ,*png|jpeg|gif)	exec gpicview "$@" ;;
