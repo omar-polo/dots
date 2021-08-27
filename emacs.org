@@ -2989,6 +2989,7 @@ Here be dragons.
 
     #+begin_src emacs-lisp
       (use-package pass
+        :custom ((pass-show-keybindings nil))
         :bind (("C-z P" . pass)))
     #+end_src
 
@@ -3167,6 +3168,68 @@ Here be dragons.
         :straight nil
         :custom ((url-cookie-trusted-urls nil)
                  (url-cookie-untrusted-urls '(".*"))))
+    #+end_src
+
+*** exwm
+
+    not tangled!
+
+    #+begin_src emacs-lisp :tangle no
+      (use-package exwm
+        :hook ((exwm-update-class . op/exwm-update-class)
+               (exwm-update-title . op/exwm-update-title))
+        :custom ((exwm-input-simulation-keys
+                  '(
+                    ;; movement
+                    ([?\C-b] . [left])
+                    ([?\M-b] . [C-left])
+                    ([?\C-f] . [right])
+                    ([?\M-f] . [C-right])
+                    ([?\C-p] . [up])
+                    ([?\C-n] . [down])
+                    ([?\C-a] . [home])
+                    ([?\C-e] . [end])
+                    ([?\M-v] . [prior])
+                    ([?\C-v] . [next])
+                    ([?\C-d] . [delete])
+                    ([?\C-k] . [S-end delete])
+                    ;; cut/paste.
+                    ([?\C-w] . [?\C-x])
+                    ([?\M-w] . [?\C-c])
+                    ([?\C-y] . [?\C-v])
+                    ;; search
+                    ([?\C-s] . [?\C-f]))))
+        :bind (("s-r" . exwm-reset)
+               ("s-w" . exwm-workspace-switch)
+               ("M-&" . op/run-command)
+
+               :map exwm-mode-map
+               ("C-q" . exwm-input-send-next-key))
+        :config
+        (setenv "EDITOR" "emacsclient")
+        (setenv "VISUAL" "emacsclient")
+
+        (cl-loop for k in '(?& ?\{ ?\[ ?\( ?= ?+ ?\) ?\] ?\} ?!)
+                 for i from 1
+                 do (define-key global-map (kbd (format "s-%c" k))
+                      (lambda ()
+                        (interactive)
+                        (exwm-workspace-switch-create i))))
+
+        (defun op/exwm-update-class ()
+          (unless (or (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+                      (string= "gimp" exwm-instance-name))
+            (exwm-workspace-rename-buffer exwm-class-name)))
+
+        (defun op/exwm-update-title ()
+          (when (or (not exwm-instance-name)
+                    (string-prefix-p "sun-awt-X11-" exwm-instance-name)
+                    (string= "gimp" exwm-instance-name))
+            (exwm-workspace-rename-buffer exwm-title)))
+
+        (defun op/run-command (cmd)
+          (interactive (list (read-shell-command "$ ")))
+          (start-process-shell-command cmd nil cmd)))
     #+end_src
 
 *** elpher
