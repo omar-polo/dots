@@ -549,6 +549,7 @@ Here be dragons.
                  (desktop-restore-frames nil)))
     #+end_src
 *** recentf
+
     #+begin_src emacs-lisp
       (require 'recentf)
       (recentf-mode t)
@@ -564,6 +565,7 @@ Here be dragons.
 
       (define-key global-map (kbd "C-x C-r") #'op/find-recentf)
     #+end_src
+
 *** Gemini for =thingatpoint=
     I don't exactly remember why, but this should enable the
     =gemini://= scheme in some kind of buffers.
