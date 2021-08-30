@@ -2040,6 +2040,16 @@ Here be dragons.
      #+begin_src emacs-lisp
        (add-hook 'text-mode-hook #'abbrev-mode)
      #+end_src
+**** diff
+
+     A small usability tweak for =diff-mode=: I like to have ~M-SPC~
+     scroll down instead then up, just like in telescope!
+
+     #+begin_src emacs-lisp
+       (with-eval-after-load 'diff-mode
+         (define-key diff-mode-map (kbd "M-SPC") #'scroll-down-command))
+     #+end_src
+
 **** elisp
      Enable prettify and checkdock in emacs lisp mode: the former
      transforms =lambda= into =λ=, and the latter enables style
