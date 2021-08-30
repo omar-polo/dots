@@ -2478,6 +2478,14 @@ Here be dragons.
        (use-package lua-mode
          :mode "\\.lua\\'")
      #+end_src
+
+     =lua-lsp= is the LSP server for lua, let's hook it into eglot
+     #+begin_src emacs-lisp
+       (with-eval-after-load 'eglot
+         (add-to-list 'eglot-server-programs
+                      '((lua-mode) . ("lua-lsp"))))
+     #+end_src
+
 **** GDScript
      GDScript is the scripting language of the Godot game engine.  The
      =gdscript-mode= provides also format (via a python program) and
