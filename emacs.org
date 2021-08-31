@@ -3395,7 +3395,9 @@ Here be dragons.
       (use-package elfeed
         :bind (("C-x w" . elfeed)
                :map elfeed-show-mode-map
-               ("q" . delete-window))
+               ("q" . delete-window)
+               ("S-SPC" . scroll-down-command)
+               ("M-SPC" . scroll-down-command))
         :custom (elfeed-feeds
                  '("https://undeadly.org/cgi?action=rss&full=yes&items=10"
                    "http://www.tedunangst.com/flak/rss"
