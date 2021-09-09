@@ -3428,6 +3428,7 @@ Here be dragons.
                    "https://cestlaz.github.io/rss.xml"
                    "https://utcc.utoronto.ca/~cks/space/blog/?atom"
                    "https://irreal.org/blog/?feed=rss2"
+                   "https://jao.io/blog/rss.xml"
                    "https://planet.lisp.org/rss20.xml"
                    "https://insideclojure.org/feed.xml"
                    "https://tech.toryanderson.com/index.xml"
