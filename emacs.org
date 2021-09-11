@@ -142,6 +142,15 @@ Here be dragons.
    it's better than other similar tools (cask, qelpa, ...), it's the
    first one I tried and so far I like it.
 
+   <2021-09-11 Sat> straight keeps loading =project= from ELPA instead
+   of using the one bundled with Emacs.  Since I'm using Emacs from
+   the master branch it's pretty annoying.  I've found that requiring
+   project here will avoid loading the ELPA one.
+
+   #+begin_src emacs-lisp
+     (require 'project)
+   #+end_src
+
    #+begin_src emacs-lisp
      (defvar bootstrap-version)
      (defvar straight-use-package-by-default t)
