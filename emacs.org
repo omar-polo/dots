@@ -3092,10 +3092,6 @@ Here be dragons.
         (setq emms-info-libtag-known-extensions
               (regexp-opt '("opus" "mp3" "mp4" "m4a" "ogg" "flac" "spx" "wma")))
 
-        ;; use my backend for sndioctl
-        (require 'emms-volume-sndioctl)
-        (setq-default emms-volume-change-function 'emms-volume-sndioctl-change)
-
         (defun my/tick-symbol (x)
           "Return a tick if X is true-ish."
           (if x "x" " "))
@@ -3989,32 +3985,6 @@ Here be dragons.
       (provide-theme 'minimal-light)
       ;;; minimal-light-theme.el ends here
 
-    #+end_src
-
-*** emms-volume-sndioctl
-
-    It's a EMMS volume backend for =sndioctl(1)=.  I should probably
-    send it upstream.
-
-    #+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/emms-volume-sndioctl.el
-      ;;; emms-volume-sndioctl.el --- a mode for changing volume using sndioctl
-
-      ;; This file is NOT part of EMMS.
-
-      ;;;###autoload
-      (defun emms-volume-sndioctl-change (amount)
-        "Change sndioctl output.level by AMOUNT."
-        (message "Playback channels: %s"
-                 (with-temp-buffer
-                   (when (zerop
-                          (call-process "sndioctl" nil (current-buffer) nil
-                                        "-n"
-                                        (format "output.level=%s%f"
-                                                (if (> amount 0) "+" "")
-                                                (/ (float amount) 100))))
-                     (replace-regexp-in-string "\n" "" (buffer-string))))))
-
-      (provide 'emms-volume-sndioctl)
     #+end_src
 
 *** even-more-cua
