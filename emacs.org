@@ -2495,7 +2495,8 @@ Here be dragons.
      Nothing fancy, just load the package
      #+begin_src emacs-lisp
        (use-package lua-mode
-         :mode "\\.lua\\'")
+         :mode "\\.lua\\'"
+         :custom ((lua-default-application "lua51")))
      #+end_src
 
      =lua-lsp= is the LSP server for lua, let's hook it into eglot
