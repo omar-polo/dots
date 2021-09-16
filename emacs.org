@@ -2496,6 +2496,7 @@ Here be dragons.
      #+begin_src emacs-lisp
        (use-package lua-mode
          :mode "\\.lua\\'"
+         :hook ((lua-mode . op/disable-tabs))
          :custom ((lua-default-application "lua51")))
      #+end_src
 
