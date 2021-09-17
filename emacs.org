@@ -2497,7 +2497,7 @@ Here be dragons.
        (use-package lua-mode
          :mode "\\.lua\\'"
          :hook ((lua-mode . op/disable-tabs))
-         :custom ((lua-default-application "lua51")))
+         :custom ((lua-default-application "lua53")))
      #+end_src
 
      =lua-lsp= is the LSP server for lua, let's hook it into eglot
