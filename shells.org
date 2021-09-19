@@ -35,6 +35,14 @@
   - the rest is the usual =$PATH= on OpenBSD, with the addition of
     java and plan9 at the end.
 
+  Just in case I want to play with lua again:
+
+  #+begin_src sh
+    if which luarocks-5.3 2>/dev/null >/dev/null; then
+	    eval "$(luarocks-5.3 path --bin)"
+    fi
+  #+end_src
+
   Tell npm to install things globally in the right directory:
 
   #+begin_src sh
