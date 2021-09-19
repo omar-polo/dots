@@ -939,8 +939,9 @@
 	     ,*m4a)		exec mpv --force-window --lavfi-complex='[aid1] asplit [ao] [v] ; [v] showwaves=mode=line:split_channels=1 [vo]' "$@" ;;
 	     ,*svg)		exec inkscape "$@" ;;
 	     ,*core)		;; # do nothing
-	     ,*png|jpeg|gif)	exec gpicview "$@" ;;
+	     ,*png)		exec gpicview "$@" ;;
 	     ,*gif)		exec gpicview "$@" ;;
+	     ,*webp)		exec gpicview "$@" ;;
 	     ,*)		exec emacsclient -c "$@" ;;
      esac
    #+end_src
