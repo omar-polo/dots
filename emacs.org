@@ -1619,7 +1619,7 @@ Here be dragons.
 
         (let ((c-like '(awk-mode c++mode cc-mode c-mode css-mode go-mode java-mode
                                  js-mode json-mode python-mode web-mode es-mode
-                                 perl-mode)))
+                                 perl-mode lua-mode)))
           (dolist (x `(("{" . ,c-like)
                        ("[" . ,c-like)
                        ("(" . (sql-mode ,@c-like))))
