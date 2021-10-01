@@ -78,7 +78,7 @@
   docker-cli to transparently talk to the VM:
 
   #+begin_src sh
-    export DOCKER_HOST=tcp://100.64.1.3:2375
+    export DOCKER_HOST=ssh://op@100.64.2.3:22
   #+end_src
 
   I like to use =mg= as my default editor, but under =vterm= is a bit
