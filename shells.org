@@ -126,7 +126,21 @@
     export NO_COLOR='yes, please'
     export CMAKE_COLOR_MAKEFILE='OFF'
     export WG_COLOR_MODE=never
-    export TREE_COLORS=no
+  #+end_src
+
+  As an exception to the "no colors" rules, I'm trying to enabling
+  some colors in =tog=, but cautiously, and see how it goes:
+
+  #+begin_src sh
+    export TOG_COLORS=yes
+    export TOG_COLOR_DIFF_MINUS=magenta
+    export TOG_COLOR_DIFF_PLUS=blue
+    export TOG_COLOR_DIFF_CHUNK_HEADER=green
+    export TOG_COLOR_DIFF_META=default
+    export TOG_COLOR_COMMIT=default
+    export TOG_COLOR_AUTHOR=default
+    export TOG_COLOR_DATE=default
+    export TOG_COLOR_REFS_REMOTES=red
   #+end_src
 
   Then disable the colors in boot (a clojure build tool I'm not using
