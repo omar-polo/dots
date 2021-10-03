@@ -1065,7 +1065,6 @@ Here be dragons.
       (define-key global-map (kbd "M-u")   #'upcase-dwim)
       (define-key global-map (kbd "M-l")   #'downcase-dwim)
       (define-key global-map (kbd "M-c")   #'capitalize-dwim)
-
     #+end_src
 
     Scroll-lock is sometimes useful to re-read the code.  The idea is
