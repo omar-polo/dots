@@ -1068,6 +1068,26 @@ Here be dragons.
 
     #+end_src
 
+    Scroll-lock is sometimes useful to re-read the code.  The idea is
+    that command that usually moves the point (e.g. =next-line=) now
+    scroll the buffer keeping the point in the same "visual"
+    position.  I've also got a keyboard with a ~Scr Lk~ key, so why
+    don't use it?
+
+    The only small annoyance is that I've bound ~<up>~ and ~<down>~ to
+    some variants of =copy-from-above-command=, so revert that when
+    we're on scroll-lock mode.
+
+    Unfortunately, this doesn't seem to work :/
+
+    #+begin_src emacs-lisp
+      (use-package scroll-lock
+        :straight nil
+        :bind (:map scroll-lock-mode
+                    ("<down>" . scroll-lock-next-line)
+                    ("<up>" . scroll-lock-previous-line)))
+    #+end_src
+
 *** Auto-saving
     I have a problem with compulsive saving.  I type =C-x C-s= every
     few keystroke to write the buffer I'm editing.
