@@ -105,6 +105,14 @@
     export MANPAGER=less
   #+end_src
 
+  I've found a cool pager for PostgreSQL, [[https://github.com/okbob/pspg][pspg]].  It's designed
+  explicitly for tabular data.  Extra points for having some cool
+  light themes!  Tao light theme (the number 20) is my favourite.
+
+  #+begin_src sh
+    export PSQL_PAGER='pspg -s20'
+  #+end_src
+
   I'm using reposync to manage my local clone of the OpenBSD source
   tree.  Technically this isn't needed, because now =/usr/ports= is a
   checkout from =/home/cvs/...=, but anyway
