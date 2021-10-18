@@ -21,7 +21,7 @@
 
   I also tend to have an abnormal =$PATH=:
   #+begin_src sh
-    PATH=$HOME/bin:$HOME/opt/emacs/bin:$HOME/opt/gcc10/bin:$HOME/go/bin:$HOME/opt/unnethack/bin:$HOME/.local/bin:$HOME/.node_modules/bin:/usr/ports/infrastructure/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/usr/local/sbin:/usr/games:/usr/local/jdk-11/bin:$PLAN9/bin
+    PATH=$HOME/bin:$HOME/opt/emacs/bin:$HOME/opt/gcc10/bin:$HOME/go/bin:$HOME/opt/unnethack/bin:$HOME/.local/bin:$HOME/.node_modules/bin:/home/ports/infrastructure/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/usr/local/sbin:/usr/games:/usr/local/jdk-11/bin:$PLAN9/bin
     export PATH HOME TERM
   #+end_src
 
@@ -31,7 +31,7 @@
   - =$HOME/opt/*= contains various stuff I compile from source, like emacs
   - =$HOME/.local/bin= is XDG stuff I'm practically forced to use
   - =$HOME/.node_modules/bin= is for node
-  - =/usr/ports/infrastructure/bin= holds some handy port tools
+  - =/home/ports/infrastructure/bin= holds some handy port tools
   - the rest is the usual =$PATH= on OpenBSD, with the addition of
     java and plan9 at the end.
 
@@ -114,7 +114,7 @@
   #+end_src
 
   I'm using reposync to manage my local clone of the OpenBSD source
-  tree.  Technically this isn't needed, because now =/usr/ports= is a
+  tree.  Technically this isn't needed, because now =/home/ports= is a
   checkout from =/home/cvs/...=, but anyway
 
   #+begin_src sh
@@ -262,7 +262,7 @@
   =CDPATH= is super-useful!  I wrote [[https://www.omarpolo.com/post/enjoying-cdpath.html][a post about it]], also.
 
   #+begin_src sh
-    export CDPATH=.:$HOME/w:/usr/ports:/usr/ports/mystuff:$HOME/quicklisp/local-projects
+    export CDPATH=.:$HOME/w:/home/ports:/home/ports/mystuff:$HOME/quicklisp/local-projects
   #+end_src
 
   I love to hate gpg!  It needs some special treatments to work, and
@@ -576,7 +576,7 @@
    #+begin_src sh
      # ports stuff
      alias portsql='sqlite3 /usr/local/share/sqlports'
-     alias portslol='make 2>&1 | /usr/ports/infrastructure/bin/portslogger .'
+     alias portslol='make 2>&1 | /home/ports/infrastructure/bin/portslogger .'
      alias portspldc='make port-lib-depends-check'
      alias portsldc='make lib-depends-check'
      alias portsplif='diff -up pkg/PLIST.orig pkg/PLIST'
@@ -585,15 +585,15 @@
      alias portsrc='cd `make show=WRKSRC`'
      alias portsfast='MAKE_JOBS=6 make'
 
-     portsdiff() { cvs diff > /usr/ports/mystuff/${PWD##*/}.diff  ; less /usr/ports/mystuff/${PWD##*/}.diff ;}
-     portslessdiff() { less /usr/ports/mystuff/${PWD##*/}.diff  ; }
-     # portscp() { scp /usr/ports/mystuff/${PWD##*/}.diff virtie:/var/www/iota/ports/ && echo https://chown.me/iota/ports/${PWD##*/}.diff ;}
+     portsdiff() { cvs diff > /home/ports/mystuff/${PWD##*/}.diff  ; less /home/ports/mystuff/${PWD##*/}.diff ;}
+     portslessdiff() { less /home/ports/mystuff/${PWD##*/}.diff  ; }
+     # portscp() { scp /home/ports/mystuff/${PWD##*/}.diff virtie:/var/www/iota/ports/ && echo https://chown.me/iota/ports/${PWD##*/}.diff ;}
      portspy3() { FLAVOR="python3" make "$@" ;}
      portspy3and2() { make "$@" ; FLAVOR="python3" make "$@" ;}
-     portspygrep() { (cd /usr/ports && grep "$@" */py-*/Makefile ) ;}
+     portspygrep() { (cd /home/ports && grep "$@" */py-*/Makefile ) ;}
      portslib() { nm -g "$1" | cut -c10- | grep -e^T > /tmp/"$(pwd |xargs basename)" ;}
-     portsfind() { find /usr/ports -iname "${1}" -exec grep -iH ${2} {} \; ;}
-     portsgrep() { ( cd /usr/ports && grep "$@" */*/Makefile */*/*/Makefile ) ;}
+     portsfind() { find /home/ports -iname "${1}" -exec grep -iH ${2} {} \; ;}
+     portsgrep() { ( cd /home/ports && grep "$@" */*/Makefile */*/*/Makefile ) ;}
 
      alias mup="make update-patches"
      alias pfast="MAKE_JOBS=7 make"
@@ -602,8 +602,8 @@
 
      pclear()
      {
-	     doas find /usr/ports/packages/ -iname "*${1:?}*" -delete
-	     doas find /usr/ports/plist/ -iname "*${1:?}*" -delete
+	     doas find /home/ports/packages/ -iname "*${1:?}*" -delete
+	     doas find /home/ports/plist/ -iname "*${1:?}*" -delete
      }
    #+end_src
 
