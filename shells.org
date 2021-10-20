@@ -259,6 +259,17 @@
     HISTSIZE=10000
   #+end_src
 
+  =reset= doesn't work as expected inside tmux, the old output can
+  still be consulted when scrolling.  If I bother to type =reset= I
+  want to be sure that the history was cleared, otherwise I'd use
+  =clear=.
+
+  #+begin_src sh
+    if [ -n "$TMUX" ]; then
+	    alias reset='reset && tmux clear-history'
+    fi
+  #+end_src
+
   =CDPATH= is super-useful!  I wrote [[https://www.omarpolo.com/post/enjoying-cdpath.html][a post about it]], also.
 
   #+begin_src sh
@@ -892,6 +903,7 @@
 	     echo keep
 	     echo lagrange
 	     echo libreoffice
+	     echo links -g -mode 800x600
 	     echo lmms
 	     echo luakit
 	     echo lxappearance
@@ -905,6 +917,7 @@
 	     echo spectral
 	     echo tor-browser
 	     echo xfe
+	     echo zathura
 
      ) | e
    #+end_src
