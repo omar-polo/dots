@@ -3473,6 +3473,7 @@ Here be dragons.
                    "https://github.com/paul-nameless/tg/releases.atom"
                    "https://github.com/YACReader/yacreader/releases.atom"
                    "https://github.com/luarocks/luarocks/releases.atom"
+                   "https://github.com/okbob/pspg/releases.atom"
 
                    "https://www.crimsonmagic.me/feed/"
                    "https://fullybookedtls.wordpress.com/feed/"))
