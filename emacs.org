@@ -436,6 +436,20 @@ Here be dragons.
      (defalias 'unload-theme #'disable-theme)
    #+end_src
 
+   Pasting from the primary selection is handy in various situations,
+   but having to press ~mouse2~ with a surgical-precision is not
+   something I like.  Taken from a conversation with cage, here's a
+   better way:
+
+   #+begin_src emacs-lisp
+     (defun paste-at-point ()
+       (interactive)
+       (insert (gui-get-primary-selection)))
+
+     (define-key global-map (kbd "<mouse-2>") #'paste-at-point)
+     (define-key global-map (kbd "S-<insert>") #'paste-at-point)
+   #+end_src
+
 *** Font
     I discovered this font thanks to a submission on the ports@
     mailing list.  I'm just trying it for now, I'm not sure if I
