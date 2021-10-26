@@ -3466,6 +3466,9 @@ Here be dragons.
                    "https://owarisubs.lacumpa.biz/feed/"
                    "https://asenshi.moe/feed/"
                    "https://godotengine.org/rss.xml"
+
+                   "https://github.com/go-gitea/gitea/releases.atom"
+
                    "https://github.com/yshui/picom/releases.atom"
                    "https://github.com/vslavik/poedit/releases.atom"
                    "https://github.com/TokTok/c-toxcore/releases.atom"
