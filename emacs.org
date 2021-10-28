@@ -3046,8 +3046,8 @@ Here be dragons.
     I'm trying to use GNUS to read usenet.  I made an account over
     at [[https://www.eternal-september.org/][eternal-september.org]], added
 
-    #+begin_src text
-      machine news.eternal-september.org login op force yes password ****
+    #+begin_src authinfo
+      machine news.eternal-september.org login mynick force yes password ****
     #+end_src
 
     in =~/.authinfo=.  Then, to tell GNUS to connect to the server:
