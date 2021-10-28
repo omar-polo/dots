@@ -3041,6 +3041,32 @@ Here be dragons.
        (define-key dired-mode-map (kbd "C-c C-a") #'op/mml-attach-multiple-files)
      #+end_src
 
+*** news
+    I'm trying to use GNUS to read usenet.  I made an account over
+    at [[https://www.eternal-september.org/][eternal-september.org]], added
+
+    #+begin_src text
+      machine news.eternal-september.org login op force yes password ****
+    #+end_src
+
+    in =~/.authinfo=.  Then, to tell GNUS to connect to the server:
+
+    #+begin_src emacs-lisp
+      (setq gnus-select-method '(nntp "news.eternal-september.org"))
+    #+end_src
+
+    This bit could also be added to =~/.gnus= eventually.
+
+    At this point =M-x gnus RET= and I'm ready to read the news!
+
+    Gnus has some strange keys:
+
+    - =A A= :: to list all the groups known to the server
+    - =u= :: to toggle the subscription to the group at point
+    - =M M u u= :: (yes, really) to mark an entry as unread
+
+    etc...
+
 *** pass
     I've recently switched to the =pass= password manager.  It stores
     every password in a gpg-encrypted file inside a git repository,
