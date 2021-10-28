@@ -4,6 +4,7 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
 #+OPTIONS: H:6
 #+TOC: headlines 6
+#+STARTUP: indent
 
 * Emacs stuff
 
