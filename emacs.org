@@ -4,11 +4,10 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="solarized-light.css" />
 #+OPTIONS: H:6
 #+TOC: headlines 6
-#+STARTUP: indent
 
 * Emacs stuff
 
-Here be dragons.
+  Here be dragons.
 
 ** early-init.el
    Starting from emacs 27 (I guess) there is an additional
@@ -176,77 +175,78 @@ Here be dragons.
    day.
 
    #+begin_src emacs-lisp :noweb no-export
-          (use-package org
-            :straight nil
-            :bind (("C-c c" . org-capture)
-                   ("C-c a" . org-agenda)
-                   ("<f7> s" . org-store-link)
-                   :map org-src-mode-map
-                   ("C-x w" . org-edit-src-exit)
-                   ("C-x C-s" . org-edit-src-exit))
-            :hook ((org-mode . op/org-setup))
-            :custom ((org-todo-keywords '((sequence "TODO" "WAITING" "|" "DONE")
-                                          (sequence "IDEA" "WRITING" "|" "POSTED")
-                                          (sequence "REPORT" "BUG" "KNOWCAUSE" "|" "FIXED")
-                                          (sequence "|" "CANCELLED")))
-                     (org-capture-templates '(("n" "annotate something" entry (file "~/org/personal.org")
-                                               "* %? :note:\n  %a")
-                                              ("t" "something to do" entry (file "~/org/personal.org")
-                                               "* TODO %?\n %a")
-                                              ("b" "bug" entry (file "~/org/personal.org")
-                                               "* REPORT %?\n  %a")))
-                     (org-ellipsis " [+]")
-                     (org-imenu-depth 4)
-                     (org-startup-folded t)
-                     (org-startup-with-inline-images t)
-                     (org-fontify-quote-and-verse-blocks t)
-                     (org-use-speed-commands t)
-                     (org-src-window-setup 'current-window)
-                     (org-directory "~/org")
-                     (org-agenda-files '("~/org"))
-                     (org-refile-use-outline-path t)
-                     (org-outline-path-complete-in-steps nil)
-                     (org-refile-targets '((nil :maxlevel . 3)
-                                           (org-agenda-files :maxlevel . 3)))
-                     (org-src-fontify-natively t)
-                     (org-clock-out-remove-zero-time-clocks t)
-                     (org-clock-out-when-done t)
-                     (org-clock-auto-clock-resolution '(when-no-clock-is-running))
-                     (org-clock-report-include-clocking-task t)
-                     (org-time-stamp-rounding-minutes '(1 1))
-                     (org-clock-history-length 23)
-                     (org-clock-in-resume t)
-                     (org-confirm-babel-evaluate nil))
-            :config
-            (require 'org-protocol)
+     (use-package org
+       :straight nil
+       :bind (("C-c c" . org-capture)
+              ("C-c a" . org-agenda)
+              ("<f7> s" . org-store-link)
+              :map org-src-mode-map
+              ("C-x w" . org-edit-src-exit)
+              ("C-x C-s" . org-edit-src-exit))
+       :hook ((org-mode . op/org-setup))
+       :custom ((org-todo-keywords '((sequence "TODO" "WAITING" "|" "DONE")
+                                     (sequence "IDEA" "WRITING" "|" "POSTED")
+                                     (sequence "REPORT" "BUG" "KNOWCAUSE" "|" "FIXED")
+                                     (sequence "|" "CANCELLED")))
+                (org-capture-templates '(("n" "annotate something" entry (file "~/org/personal.org")
+                                          "* %? :note:\n  %a")
+                                         ("t" "something to do" entry (file "~/org/personal.org")
+                                          "* TODO %?\n %a")
+                                         ("b" "bug" entry (file "~/org/personal.org")
+                                          "* REPORT %?\n  %a")))
+                (org-adapt-indentation t)
+                (org-ellipsis " [+]")
+                (org-imenu-depth 4)
+                (org-startup-folded t)
+                (org-startup-with-inline-images t)
+                (org-fontify-quote-and-verse-blocks t)
+                (org-use-speed-commands t)
+                (org-src-window-setup 'current-window)
+                (org-directory "~/org")
+                (org-agenda-files '("~/org"))
+                (org-refile-use-outline-path t)
+                (org-outline-path-complete-in-steps nil)
+                (org-refile-targets '((nil :maxlevel . 3)
+                                      (org-agenda-files :maxlevel . 3)))
+                (org-src-fontify-natively t)
+                (org-clock-out-remove-zero-time-clocks t)
+                (org-clock-out-when-done t)
+                (org-clock-auto-clock-resolution '(when-no-clock-is-running))
+                (org-clock-report-include-clocking-task t)
+                (org-time-stamp-rounding-minutes '(1 1))
+                (org-clock-history-length 23)
+                (org-clock-in-resume t)
+                (org-confirm-babel-evaluate nil))
+       :config
+       (require 'org-protocol)
 
-            (defun op/org-setup ()
-              (hl-line-mode +1)
-              (auto-fill-mode +1)
-              (whitespace-mode -1)
-              (setq-local cursor-type 'bar)
-              (setq-local delete-trailing-lines t)
-              (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))
+       (defun op/org-setup ()
+         (hl-line-mode +1)
+         (auto-fill-mode +1)
+         (whitespace-mode -1)
+         (setq-local cursor-type 'bar)
+         (setq-local delete-trailing-lines t)
+         (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))
 
-            (org-link-set-parameters "gemini"
-                                     :follow (lambda (p) (elpher-go (concat "gemini:" p)))
-                                     :display 'full)
+       (org-link-set-parameters "gemini"
+                                :follow (lambda (p) (elpher-go (concat "gemini:" p)))
+                                :display 'full)
 
-            (org-babel-do-load-languages
-             'org-babel-load-languages
-             '((emacs-lisp . t)
-               (C . t)
-               (R . t)
-               (sql . t)
-               (lisp . t)
-               (shell . t)
-               (sqlite . t)
-               (python . t)
-               (gnuplot . t)))
-            (setq org-babel-lisp-eval-fn #'sly-eval)
+       (org-babel-do-load-languages
+        'org-babel-load-languages
+        '((emacs-lisp . t)
+          (C . t)
+          (R . t)
+          (sql . t)
+          (lisp . t)
+          (shell . t)
+          (sqlite . t)
+          (python . t)
+          (gnuplot . t)))
+       (setq org-babel-lisp-eval-fn #'sly-eval)
 
-            <<org-roam>>
-            <<org-tree-slide>>)
+       <<org-roam>>
+       <<org-tree-slide>>)
    #+end_src
 
    I'm having some problems with org, in particular =C-c C-e ...=
@@ -467,6 +467,13 @@ Here be dragons.
         (set-face-attribute 'default nil :font font :height 100)
         (set-frame-font font nil t))
     #+end_src
+
+    Also, I'd like emojis to be rendered...
+
+    #+begin_src emacs-lisp
+      (set-fontset-font "fontset-default" 'unicode "Noto Emoji" nil 'prepend)
+    #+end_src
+
 *** tab-bar
     I initially thought I would never used the =tab-bar=, but now here
     we are.  How ironic.  Anyway, please don't show the tab-bar when
@@ -647,7 +654,9 @@ Here be dragons.
    I'm generally pretty lazy, so why pressing shift to get the case
    right?
    #+begin_src emacs-lisp
-     (setq completion-ignore-case t)
+     (setq completion-ignore-case t
+           read-file-name-completion-ignore-case t
+           read-buffer-completion-ignore-case t)
    #+end_src
 
    Misc enhancement to the minibuffer behaviour.
@@ -677,10 +686,11 @@ Here be dragons.
 
     #+begin_src emacs-lisp
       (use-package orderless
-        :custom ((completion-styles '(substring orderless))
+        :custom ((completion-styles '(orderless))
                  (completion-category-defaults nil)
                  (completion-category-overrides '((file (styles . (partial-completion)))))))
     #+end_src
+
 *** Consult
     Consult enhances various command by using the minibuffer.
     #+begin_src emacs-lisp
@@ -704,7 +714,7 @@ Here be dragons.
                ("M-g k" . consult-global-mark)
                ("M-g i" . consult-imenu)
                ("M-g I" . consult-project-imenu)
-               ("M-s f" . consult-find)
+               ("M-s f" . op/consult-find)
                ("M-s g" . consult-grep)
                ("M-s l" . consult-line)
                ("M-s k" . consult-keep-lines)
@@ -716,15 +726,42 @@ Here be dragons.
                  (xref-show-xrefs-function #'consult-xref)
                  (xref-show-definitions-function #'consult-xref)
                  (consult-narrow-key "<")
-                 (consult-project-root #'project-roots))
+                 (consult-project-root #'project-roots)
+                 (consult-find-args "find .")
+                 (consult-grep-args "grep --null --line-buffered --ignore-case -RIn"))
         :init
         (advice-add #'register-preview :override #'consult-register-window)
 
         :config
         ;; make narrowing help available in the minibuffer.
         (define-key consult-narrow-map (vconcat consult-narrow-key "?")
-          #'consult-narrow-help))
+                    #'consult-narrow-help)
+
+        ;; a find-builder that works with OpenBSD' find
+        (defun op/consult--find-builder (input)
+        "Build command line given INPUT."
+        (pcase-let* ((cmd (split-string-and-unquote consult-find-args))
+                     (type (consult--find-regexp-type (car cmd)))
+                     (`(,arg . ,opts) (consult--command-split input))
+                     (`(,re . ,hl) (funcall consult--regexp-compiler arg type)))
+          (when re
+            (list :command
+                  (append cmd
+                          (cdr (mapcan
+                                (lambda (x)
+                                  `("-and" "-iname"
+                                    ,(format "*%s*" x)))
+                                re))
+                          opts)
+                  :highlight hl))))
+
+        (defun op/consult-find (&optional dir)
+          (interactive "P")
+          (let* ((prompt-dir (consult--directory-prompt "Find" dir))
+                 (default-directory (cdr prompt-dir)))
+            (find-file (consult--find (car prompt-dir) #'op/consult--find-builder "")))))
     #+end_src
+
 *** Affe
     This is a new-ish package from the same author of consult and
     marginalia.  Honestly, I still have to use it, so this is more a
@@ -737,6 +774,7 @@ Here be dragons.
         :custom ((affe-regexp-function #'orderless-pattern-compiler)
                  (affe-highlight-function #'orderless-highlight-matches)))
     #+end_src
+
 *** Vertico
     Vertico is just like selectrum or icomplete-vertical.  It's
     written by the same author of consult, so at this point I thought
@@ -747,14 +785,19 @@ Here be dragons.
     some time profiling it, but for the time being switch back to
     [[*Selectrum][Selectrum]].
 
+    <2021-11-04 Thu> giving it another try
+
     #+begin_src emacs-lisp
-      (comment
-       (use-package vertico
-         :config (vertico-mode)))
+      (use-package vertico
+        :config (vertico-mode))
     #+end_src
 
 *** Selectrum
-    #+begin_src emacs-lisp :noweb no-export
+
+    <2021-11-04 Thu> I'm gonna give vertico another try, this is not
+    tangled anymore.
+
+    #+begin_src emacs-lisp :noweb no-export :tangle no
       (use-package selectrum
         :custom ((selectrum-highlight-candidates-function #'orderless-highlight-matches)
                  (orderless-skip-highlighting (lambda () selectrum-is-active)))
@@ -789,7 +832,8 @@ Here be dragons.
     #+begin_src emacs-lisp
       (use-package embark
         :straight (:type git :host github :repo "oantolin/embark")
-        :bind (:map minibuffer-local-completion-map
+        :bind (("C-." . embark-act)
+               :map minibuffer-local-completion-map
                     ("M-t" . embark-act)
                     ("M-h" . embark-become)
                     :map minibuffer-local-map
@@ -825,7 +869,7 @@ Here be dragons.
          (window-sides-vertical nil)
          (switch-to-buffer-in-dedicated-window 'pop)
          (split-height-threshold 160)
-         (split-width-threshold 90)
+         (split-width-threshold 110)
          (split-window-preferred-function #'op/split-window-sensibly))
         :config
         (defun op/split-window-prefer-horizontal (&optional window)
@@ -3046,7 +3090,7 @@ Here be dragons.
     I'm trying to use GNUS to read usenet.  I made an account over
     at [[https://www.eternal-september.org/][eternal-september.org]], added
 
-    #+begin_src authinfo
+    #+begin_src authinfo :tangle no
       machine news.eternal-september.org login mynick force yes password ****
     #+end_src
 
@@ -3115,6 +3159,18 @@ Here be dragons.
 *** EMMS
     Emacs Multi Media System is cool.  It only needs a decent UI,
     which I provide via hydra.
+
+    A good companion for EMMS is versuri: a package that fetches
+    lyrics from various websites and saves them locally.
+
+    #+begin_src emacs-lisp
+      (use-package versuri
+        :config
+        (defun op/versuri-select ()
+          (interactive)
+          (when-let (match (call-interactively #'versuri-search))
+            (apply #'versuri-display match))))
+    #+end_src
 
     There's a bit of hackery to make it see and play =opus= files,
     it's probably not needed anymore but who knows.
@@ -3208,6 +3264,14 @@ Here be dragons.
                   (emms-playlist-mode-play-smart)
                   (emms-playlist-mode-center-current))))))
 
+        (defun op/emms-current-lyrics ()
+          "Find the lyrics for the current song."
+          (interactive)
+          (let* ((track  (cdr (emms-playlist-current-selected-track)))
+                 (artist (cdr (assoc 'info-artist (cdr (emms-playlist-current-selected-track)))))
+                 (title  (cdr (assoc 'info-title (cdr (emms-playlist-current-selected-track))))))
+            (versuri-display artist title)))
+
         (defhydra hydra-emms (:hint nil)
           "
       %(my/emms-player-status) %(emms-track-description (emms-playlist-current-selected-track))
@@ -3219,7 +3283,7 @@ Here be dragons.
       ^ ^          _<_: seek bw     _#_: shuffle            _s_elect
       ^ ^          _>_: seek fw     _%_: sort               _g_oto EMMS buffer
       ^ ^        _SPC_: play/pause                        _l_yrics
-      ^ ^        _DEL_: restart
+      ^ ^        _DEL_: restart                           _L_yrics select
         "
           ("+" emms-volume-raise)
           ("-" emms-volume-lower)
@@ -3241,7 +3305,8 @@ Here be dragons.
           ("g" (progn (emms)
                       (with-current-emms-playlist
                         (emms-playlist-mode-center-current))))
-          ("l" my/emms-current-lyrics)
+          ("l" op/emms-current-lyrics :exit t)
+          ("L" op/versuri-select :exit t)
 
           ("q" nil :exit t)))
     #+end_src
