@@ -672,6 +672,14 @@
      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
    #+end_src
 
+   When in the minibuffer I find handy for ~C-w~ to really be
+   =backward-kill-word= instead of =kill-region=.  I mean, I don't
+   usually cut things from the minibuffer!
+
+   #+begin_src emacs-lisp
+     (define-key minibuffer-mode-map (kbd "C-w") #'backward-kill-word)
+   #+end_src
+
 *** Marginalia
     Enhances the minibuffer completions with additional informations
     #+begin_src emacs-lisp
@@ -3153,7 +3161,8 @@
       (use-package sndio
         :straight nil
         :load-path "~/.emacs.d/lisp/sndio.el/"
-        :bind ("C-z a a" . sndio))
+        :bind (("C-z a A" . sndio)
+               ("C-z a a" . sndio-win-open)))
     #+end_src
 
 *** EMMS
@@ -3280,13 +3289,14 @@
       ^^^^^^^^----------------------------------------------------------------
       _+_: inc     _n_: next        _r_: repeat one [% s(my/tick-symbol emms-repeat-track)]     _t_oggle modeline
       _-_: dec     _p_: prev        _R_: repeat all [% s(my/tick-symbol emms-repeat-playlist)]     _T_oggle only time
-      ^ ^          _<_: seek bw     _#_: shuffle            _s_elect
+      _v_: vol     _<_: seek bw     _#_: shuffle            _s_elect
       ^ ^          _>_: seek fw     _%_: sort               _g_oto EMMS buffer
       ^ ^        _SPC_: play/pause                        _l_yrics
       ^ ^        _DEL_: restart                           _L_yrics select
         "
           ("+" emms-volume-raise)
           ("-" emms-volume-lower)
+          ("v" sndio-win-open :exit t)
           ("n" emms-next)
           ("p" emms-previous)
           ("<" emms-seek-backward)
@@ -3435,9 +3445,7 @@
     #+begin_src emacs-lisp
       (use-package rcirc
         :straight nil
-        :bind (("C-z i e" . op/rcirc-emph-nick)
-               ("C-z i d" . op/rcirc-de-emph-nick)
-               ("C-z i i" . rcirc))
+        :bind (("C-z i i" . rcirc))
         :custom ((rcirc-buffer-maximum-lines 1000)
                  (rcirc-log-flag t)
                  (rcirc-omit-responses '("JOIN" "PART" "QUIT"
@@ -3451,29 +3459,86 @@
                     (flyspell-mode 1)
                     (rcirc-omit-mode)))
 
-        (defun op/rcirc-emph-nick (nick)
-          "Emphasize NICK on the fly."
-          (interactive (list
-                        (if (eq major-mode 'rcirc-mode)
-                            (completing-read "Nick: " (caddr (rcirc-completion-at-point)))
-                          (completing-read "Nick: " nil))))
-          (add-to-list 'rcirc-bright-nicks nick))
+        (setq rcirc-default-nick "op2"
+              rcirc-default-user-name "op"
+              rcirc-default-full-name "op"
+              rcirc-server-alist '(("irc.libera.chat"
+                                    :channels ("#clojure"
+                                               "#emacs"
+                                               "#gemini-it"
+                                               "#matrix"
+                                               "#openbsd"
+                                               "#openbsd-gaming"
+                                               "#gameoftrees"
+                                               "#postgresql"
+                                               "#postgresql-it")
+                                    :port 6697 :encryption tls))
+              rcirc-authinfo '(("libera"
+                                certfp
+                                "/home/op/.emacs.d/irc/key.pem"
+                                "/home/op/.emacs.d/irc/cert.pem"))))
+    #+end_src
 
-        (defun op/rcirc-de-emph-nick (nick)
-          "De-emphasize NICK on the fly (but don't dim it)"
-          (interactive (list (completing-read "Nick: " rcirc-bright-nicks)))
-          (setq rcirc-bright-nicks
-                (cl-delete nick rcirc-bright-nicks
-                           :test #'string=)))
+*** circe
 
-        ;; contains something along the lines of
-        ;;
-        ;;   (setq rcirc-authinfo
-        ;;         '(("irc.libera.chat" nickserv
-        ;;            "USERNAME" "PASSWORD")))
-        (condition-case nil
-            (load "my-rcirc-conf")
-          (error (message "Missing rcirc configuration!"))))
+    <2021-11-11 Thu> I briefly tried circe before going back to rcirc
+    and adding support for certfp to it.  Just for reference, here's
+    the configuration I used for a day.
+
+    #+begin_src emacs-lisp :tangle no
+      (use-package circe
+        :bind (("C-z i i" . circe))
+        :config
+        (tracking-mode +1)
+        (setq tracking-position 'end
+              tracking-most-recent-first t)
+
+        (setq circe-reduce-lurker-spam t
+              circe-format-say "{nick:-16s} {body}"
+              circe-format-self-say "{nick}              {body}"
+              lui-time-stamp-position 'right-margin
+              lui-time-stamp-format "%H:%M"
+              lui-fill-type nil)
+
+        ;; it's using a certificate... :D
+        (setq circe-network-options
+              '(("Libera"
+                 :host "irc.libera.chat"
+                 :port 6697
+                 :tls t
+                 :tls-keylist (("/home/op/.emacs.d/irc/key.pem"
+                                "/home/op/.emacs.d/irc/cert.pem"))
+                 :sasl-external t
+                 :nick "op2"
+                 :user "op2"
+                 :realname "op"
+                 :channels ("#clojure"
+                            "#emacs"
+                            "#gemini-it"
+                            "#matrix"
+                            "#openbsd"
+                            "#openbsd-gaming"
+                            "#gameoftrees"
+                            "#postgresql"
+                            "#postgresql-it"))))
+
+        (defun op/circe-set-margin ()
+          (setq fringes-outside-margins t
+                right-margin-width 5
+                word-wrap t
+                ;; yep, really...
+                wrap-prefix "                 ")
+          (setf (cdr (assoc 'continuation fringe-indicator-alist)) nil))
+        (add-hook 'lui-mode-hook #'op/circe-set-margin)
+
+        ;; provides some command that automatically uses /msg ServOp behind
+        ;; the scene, like /getop, /dropop, /mode, /bans, /kick
+        (require 'circe-chanop)
+
+        (require 'lui-logging)
+        (enable-lui-logging-globally)
+
+        (enable-lui-track))
     #+end_src
 
 *** telega
@@ -3583,6 +3648,8 @@
                    "https://github.com/YACReader/yacreader/releases.atom"
                    "https://github.com/luarocks/luarocks/releases.atom"
                    "https://github.com/okbob/pspg/releases.atom"
+                   "https://github.com/taisei-project/taisei/releases.atom"
+                   "https://github.com/recp/cglm/releases.atom"
 
                    "https://www.crimsonmagic.me/feed/"
                    "https://fullybookedtls.wordpress.com/feed/"))
@@ -3814,69 +3881,25 @@
     #+begin_src emacs-lisp :tangle ~/.emacs.d/lisp/my-modeline.el
       ;; -*- lexical-binding: t; -*-
 
-      (defvar my/show-minor-modes nil
-        "Show the minor mode list in the modeline.")
+      (defvar op/mode-line-format-bk mode-line-format
+        "Backup of the default `mode-line-format'.")
 
-      ;; probably this list can be deleted and simply check, in
-      ;; my/alt-mode-p if the current major-mode is special or not.
-      (defvar my/mode-line-alt-mode '(rcirc-mode mu4e-main-mode mu4e-headers-mode
-                                                 mu4e-view-mode
-                                                 sql-interactive-mode
-                                                 telega-chat-mode
-                                                 telega-root-mode)
-        "List of modes that get an alternative mode-line.")
-
-      (defun my/alt-mode-p ()
-        "Return t if the current `major-mode' is within `my/mode-line-alt-mode'."
-        (member major-mode my/mode-line-alt-mode))
-
-      (defun my/mode-line-toggle-minor-modes ()
-        "Toggle the list of minor modes in modeline."
-        (interactive)
-        (setq my/show-minor-modes (not my/show-minor-modes)))
-
-      (setq-default
-       mode-line-format
-       `(
-         ;; coding system and stuff
-         (:eval (when (not (my/alt-mode-p))
-                  `(" " ,mode-line-mule-info)))
-
-         ;; buffer name
-         " %b "
-
-         ;; major mode
-         ;; " %m "
-
-         ;; recursion level
-         (:eval
-          (let ((l (recursion-depth)))
-            (when (> l 1)
-              (list (format "level:%s" (recursion-depth))
-                    " "))))
-
-         ;; misc info
-         (:eval (unless (my/alt-mode-p)
-                  `(,mode-line-remote ,mode-line-client ,mode-line-modified)))
-
-         ;; vc can be useful
-         (:eval (when-let (vc vc-mode)
-                  `(" " ,vc " ")))
-
-         ;; percentage, line number and narrow
-         (:eval (if (my/alt-mode-p)
-                    " "
-                  (concat " %p L%l "
-                          (when column-number-mode
-                            "C%c ")
-                          "%n")))
-
-         ;; show minor modes (eventually)
-         (:eval (when my/show-minor-modes
-                  mode-line-modes))
-
-         mode-line-misc-info ;; rcirc, mu4e...
-         ))
+      (setq-default mode-line-format
+                    '("%e"
+                      mode-line-front-space
+                      mode-line-mule-info
+                      mode-line-client
+                      mode-line-modified
+                      mode-line-remote
+                      mode-line-frame-identification
+                      mode-line-buffer-identification
+                      " "
+                      mode-line-position
+                      (vc-mode vc-mode)
+                      " "
+                      ;; mode-line-modes
+                      mode-line-misc-info
+                      mode-line-end-spaces))
 
       (provide 'my-modeline)
       ;;; my-modeline.el ends here
@@ -4107,7 +4130,10 @@
                                                       :slant italic))))
 
          ;; objed
-         `(objed-hl ((,class (:background ,region))))))
+         `(objed-hl ((,class (:background ,region))))
+
+         ;; circe
+         `(circe-prompt-face ((,class (:inherit default))))))
 
       ;;;###autoload
       (when (and (boundp 'custom-theme-load-path) load-file-name)
