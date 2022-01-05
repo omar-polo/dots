@@ -461,7 +461,8 @@
     and iosevka seems tiny, yet readable.
 
     #+begin_src emacs-lisp
-      (let ((font "Iosevka Term Curly Medium 9"))
+      ;; Iosevka Term Curly Medium 9
+      (let ((font "-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1"))
         (add-to-list 'default-frame-alist `(font . ,font))
         (set-face-attribute 'default t :font font :height 100)
         (set-face-attribute 'default nil :font font :height 100)
@@ -677,7 +678,14 @@
    usually cut things from the minibuffer!
 
    #+begin_src emacs-lisp
-     (define-key minibuffer-mode-map (kbd "C-w") #'backward-kill-word)
+     (defun op/minibuffer-C-w (arg)
+       "This is `backward-kill-word', but with ARG becomes `kill-region'."
+       (interactive "P")
+       (if arg
+           (call-interactively #'kill-region)
+         (call-interactively #'backward-kill-word)))
+
+     (define-key minibuffer-mode-map (kbd "C-w") #'op/minibuffer-C-w)
    #+end_src
 
 *** Marginalia
@@ -708,6 +716,7 @@
                ("C-c b" . consult-bookmark)
                ("C-c k" . consult-kmacro)
                ("C-x M-:" . consult-complex-command)
+               ("C-x ESC ESC" . consult-complex-command)
                ("C-x b" . consult-buffer)
                ("C-x 4 b" . consult-buffer-other-window)
                ("C-x 5 b" . consult-buffer-other-frame)
@@ -2942,16 +2951,13 @@
        (use-package emacs
          :straight nil
          :bind ("<f12>" . mu4e)
-         :custom ((message-citation-line-format  "On %a, %b %d %Y, %f wrote\n")
-                  (message-default-charset 'utf8)
+         :custom ((message-default-charset 'utf8)
                   (gnus-treat-display-smileys nil)
                   (user-mail-address "op@omarpolo.com")
 
                   (mu4e-maildir (expand-file-name "~/Maildir"))
                   (mu4e-get-mail-command "mbsync -a")
                   (mu4e-update-interval 180)
-                  (mu4e-compose-signature-auto-include nil)
-                  (mu4e-compose-format-flowed nil)
                   (mu4e-compose-in-new-frame t)
                   (mu4e-change-filenames-when-moving t) ;; don't break mbsync!
                   (mu4e-attachment-dir "~/Downloads")
@@ -3011,8 +3017,13 @@
 
          (defun op/mu4e-make-bookmarks (mdir)
            (list (make-mu4e-bookmark :name "Global Unread Messages"
-                                     :query "flag:unread and not flag:trashed"
+                                     ;; I like to follow emacs-dev and emacs-users,
+                                     ;; but they get so noisy sometimes...
+                                     :query "flag:unread and not flag:trashed and not maildir:/op/emacs*"
                                      :key ?u)
+                 (make-mu4e-bookmark :name "(really) Global Unread Messages"
+                                     :query "flag:unread and not flag:trashed"
+                                     :key ?a)
                  (make-mu4e-bookmark :name "Local Unread Messages"
                                      :query (concat "maildir:" mdir "/* and flag:unread and not flag:trashed")
                                      :key ?l)
@@ -3462,21 +3473,9 @@
         (setq rcirc-default-nick "op2"
               rcirc-default-user-name "op"
               rcirc-default-full-name "op"
-              rcirc-server-alist '(("irc.libera.chat"
-                                    :channels ("#clojure"
-                                               "#emacs"
-                                               "#gemini-it"
-                                               "#matrix"
-                                               "#openbsd"
-                                               "#openbsd-gaming"
-                                               "#gameoftrees"
-                                               "#postgresql"
-                                               "#postgresql-it")
-                                    :port 6697 :encryption tls))
-              rcirc-authinfo '(("libera"
-                                certfp
-                                "/home/op/.emacs.d/irc/key.pem"
-                                "/home/op/.emacs.d/irc/cert.pem"))))
+              rcirc-server-alist '(("192.168.1.10" :nick "op" :password "op"))
+              rcirc-authinfo nil ;'(("192.168.1.10" nickserv "op" "op"))
+              ))
     #+end_src
 
 *** circe
@@ -3638,6 +3637,8 @@
                    "https://asenshi.moe/feed/"
                    "https://godotengine.org/rss.xml"
 
+                   "https://adventofcomputing.libsyn.com/rss"
+
                    "https://github.com/go-gitea/gitea/releases.atom"
 
                    "https://github.com/yshui/picom/releases.atom"
@@ -3650,6 +3651,8 @@
                    "https://github.com/okbob/pspg/releases.atom"
                    "https://github.com/taisei-project/taisei/releases.atom"
                    "https://github.com/recp/cglm/releases.atom"
+
+                   "https://causal.agency/list/pounce.atom"
 
                    "https://www.crimsonmagic.me/feed/"
                    "https://fullybookedtls.wordpress.com/feed/"))
