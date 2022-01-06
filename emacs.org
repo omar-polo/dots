@@ -460,6 +460,9 @@
     I like fonts that takes as little horizontal space as possible,
     and iosevka seems tiny, yet readable.
 
+    <2022-01-06 Thu> You know what?  bitmap fonts are cool, so I'm
+    using the xterm default one (on OpenBSD) for *everything*!
+
     #+begin_src emacs-lisp
       ;; Iosevka Term Curly Medium 9
       (let ((font "-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1"))
