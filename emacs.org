@@ -464,6 +464,8 @@
       ;; Iosevka Term Curly Medium 9
       (let ((font "-misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1"))
         (add-to-list 'default-frame-alist `(font . ,font))
+        (set-face-attribute 'variable-pitch t :font font :height 100)
+        (set-face-attribute 'variable-pitch nil :font font :height 100)
         (set-face-attribute 'default t :font font :height 100)
         (set-face-attribute 'default nil :font font :height 100)
         (set-frame-font font nil t))
