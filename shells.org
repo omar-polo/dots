@@ -516,34 +516,19 @@
      }
    #+end_src
 
-   =nnn= is a quick and useful file manager for the terminal.  One
-   useful feature is "auto-cd", where one can navigate the filesystem
-   with =nnn= and upon exit, the shell will change directory to the
-   last visited.  It's pretty simple to setup, albeit probably prone
-   to races.  While there, also define some bookmarks:
+   <2021-11-24 Wed> I've used to use =nnn=, but I've migrated to
+   =rover= for my ncurses terminal file browsers needs.
 
    #+begin_src sh
-     export NNN_BMS="h:$HOME;t:/tmp"
-     export NNN_USE_EDITOR=1
+     bind -m '^O'='^U rovercd^J^Y'
 
-     bind -m '^O'='^U ncd^J^Y'
-
-     ncd()
+     rovercd()
      {
-	     # block nesting of nnn in subshells
-	     if [ "${NNNLVL:-0}" -ge 1 ]; then
-		     echo nnn is aready running
-		     return
-	     fi
-
-	     export NNN_TMPFILE=$HOME/.config/nnn/.lastd
-
-	     nnn "$@"
-
-	     if [ -f "$NNN_TMPFILE" ]; then
-		     . "$NNN_TMPFILE"
-		     rm "$NNN_TMPFILE"
-	     fi
+	     cdfile=`mktemp`
+	     rover -d "$cdfile"
+	     dir="$(cat "$cdfile")"
+	     rm -f "$cdfile"
+	     cd "$dir"
      }
    #+end_src
 
@@ -630,6 +615,7 @@
 
     fn % { $* }
     fn git { env git --no-pager $* }
+    fn m { make $* }
   #+end_src
 
   I use the following for the plumber, although it probably can be
