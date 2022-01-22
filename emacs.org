@@ -2961,9 +2961,10 @@
          :custom ((message-default-charset 'utf8)
                   (gnus-treat-display-smileys nil)
                   (user-mail-address "op@omarpolo.com")
-
+       
                   (mu4e-maildir (expand-file-name "~/Maildir"))
-                  (mu4e-get-mail-command "mbsync -a")
+                  ;; (mu4e-get-mail-command "mbsync -a")
+                  (mu4e-get-mail-command "cmdseq 10 \"mbsync op\" 1 \"mbsync -a\"")
                   (mu4e-update-interval 180)
                   (mu4e-compose-in-new-frame t)
                   (mu4e-change-filenames-when-moving t) ;; don't break mbsync!
@@ -2973,36 +2974,36 @@
                   (mu4e-context-policy 'pick-first)
                   (mu4e-compose-context-policy 'always-ask)
                   (message-kill-buffer-on-exit t)
-
+       
                   (mu4e~view-beginning-of-url-regexp
                    "https?\\://\\|mailto:\\|gemini://")
-
+       
                   ;; use localhost to send mails
                   (message-send-mail-function #'smtpmail-send-it)
                   (smtpmail-smtp-server "localhost")
                   (smtpmail-default-smtp-server "localhost"))
          :hook (mu4e-view-mode . visual-line-mode)
          :config
-
+       
          (require 'mu4e)
-
+       
          ;; prefer the old style
          (setq mu4e-headers-thread-child-prefix '("├>" . "┣▶ ")
                mu4e-headers-thread-last-child-prefix '("└>" . "┗▶ ")
                mu4e-headers-thread-connection-prefix '("│" . "┃ ")
                mu4e-headers-thread-orphan-prefix '("┬>" . "┳▶ ")
                mu4e-headers-thread-single-orphan-prefix '("─>" . "━▶ "))
-
+       
          ;; fix the keys for the view buffer
          (define-key mu4e-view-mode-map (kbd "RET") #'push-button)
          (define-key mu4e-view-mode-map (kbd "SPC") #'scroll-up-command)
          (define-key mu4e-view-mode-map (kbd "S-SPC") #'scroll-down-command)
          ;; just like telescope :P
          (define-key mu4e-view-mode-map (kbd "M-SPC") #'scroll-down-command)
-
+       
          (add-to-list 'mu4e-view-actions
                       '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-
+       
          (defun op/mu4e-change-headers ()
            (interactive)
            (setq mu4e-headers-fields
@@ -3013,15 +3014,15 @@
                    (:to . 20)
                    (:thread-subject))))
          (add-hook 'mu4e-headers-mode-hook #'op/mu4e-change-headers)
-
+       
          (defun op/mu4e-do-compose-stuff ()
            (interactive)
            (set-fill-column 72)
            (auto-fill-mode)
            (flyspell-mode))
-
+       
          (add-hook 'mu4e-compose-mode-hook #'op/mu4e-do-compose-stuff)
-
+       
          (defun op/mu4e-make-bookmarks (mdir)
            (list (make-mu4e-bookmark :name "Global Unread Messages"
                                      ;; I like to follow emacs-dev and emacs-users,
@@ -3046,12 +3047,12 @@
                  (make-mu4e-bookmark :name "Drafts"
                                      :query (concat "maildir:" mdir "/Drafts")
                                      :key ?d)))
-
+       
          (defun op/mu4e-match-fn (mdir)
            (lambda (msg)
              (when msg
                (string-prefix-p mdir (mu4e-message-field msg :maildir)))))
-
+       
          ;; loading the mu4e configuration without halting emacs if its not found
          ;;
          ;; the my-mu4e-config.el file contains:
