@@ -516,6 +516,15 @@
      }
    #+end_src
 
+   Just a simple way to avoid adding =| less= to every =9 ...= command
+   I may want to run.
+
+   #+begin_src sh
+     function 9man {
+	     9 man $* | less
+     }
+   #+end_src
+
    <2021-11-24 Wed> I've used to use =nnn=, but I've migrated to
    =rover= for my ncurses terminal file browsers needs.
 
@@ -773,7 +782,8 @@
      fontsrv &
      fontsrvpid=$apid
 
-     font=/mnt/font/GoMono/10a/font
+     font=/usr/local/plan9/font/fixed/unicode.7x14.font
+     # font=/mnt/font/GoMono/10a/font
      FONT=/mnt/font/InputSans-Regular/10a/font
 
      $PLAN9/bin/acme -a -f $font -F $FONT $* &
